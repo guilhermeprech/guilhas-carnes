@@ -1,0 +1,333 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useCart } from "../cart-context";
+
+type Fulfillment = "DELIVERY" | "PICKUP";
+
+function formatBRL(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function buildWhatsAppMessage(input: {
+  customerName: string;
+  customerPhone: string;
+  fulfillment: Fulfillment;
+  addressText?: string;
+  notes?: string;
+  items: { name: string; qty: number; unitPrice: number }[];
+  subtotal: number;
+  deliveryFee: number;
+  totalEstimated: number;
+}) {
+  const lines = input.items.map(
+    (i) => `- ${i.qty}x ${i.name} (${formatBRL(i.unitPrice)})`
+  );
+
+  const fulfillmentLine =
+    input.fulfillment === "DELIVERY"
+      ? `🚚 Entrega (taxa fixa ${formatBRL(input.deliveryFee)})`
+      : "🏪 Retirada a combinar";
+
+  const addressBlock =
+    input.fulfillment === "DELIVERY"
+      ? [`📍 Endereço: ${input.addressText?.trim() || "(não informado)"}`]
+      : [];
+
+  const notesBlock = input.notes?.trim()
+    ? [`📝 Observações: ${input.notes.trim()}`]
+    : [];
+
+  return [
+    "Olá! Quero fazer um pedido no Guilhas Carnes & Assados 👋",
+    "",
+    `👤 Nome: ${input.customerName}`,
+    `📞 Telefone: ${input.customerPhone}`,
+    "",
+    "🛒 Itens:",
+    ...lines,
+    "",
+    `Subtotal: ${formatBRL(input.subtotal)}`,
+    `${fulfillmentLine}`,
+    ...(addressBlock.length ? ["", ...addressBlock] : []),
+    "",
+    `💰 Total estimado: ${formatBRL(input.totalEstimated)}`,
+    `✅ Confirmar disponibilidade e valor final no WhatsApp`,
+    `💳 Pagamento: Pix (após confirmação)`,
+    ...((notesBlock.length ? ["", ...notesBlock] : []) as string[]),
+  ].join("\n");
+}
+
+export default function CheckoutPage() {
+  const { items, totalItems, totalPrice } = useCart(); // totalPrice aqui é SUBTOTAL
+  const [fulfillment, setFulfillment] = useState<Fulfillment>("DELIVERY");
+
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+
+  // Endereço (simples)
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [complement, setComplement] = useState("");
+  const [reference, setReference] = useState("");
+
+  const [notes, setNotes] = useState("");
+
+  const deliveryFee = fulfillment === "DELIVERY" ? 15 : 0;
+  const subtotal = totalPrice;
+  const totalEstimated = subtotal + deliveryFee;
+
+  // Teu WhatsApp
+  const storeWhatsApp = "5554999320907";
+
+  const addressText = useMemo(() => {
+    const parts = [
+      street.trim() ? `Rua/Av: ${street.trim()}` : "",
+      number.trim() ? `Número: ${number.trim()}` : "",
+      neighborhood.trim() ? `Bairro: ${neighborhood.trim()}` : "",
+      complement.trim() ? `Compl.: ${complement.trim()}` : "",
+      reference.trim() ? `Ref.: ${reference.trim()}` : "",
+      "Cidade: Caxias do Sul",
+    ].filter(Boolean);
+    return parts.join(" • ");
+  }, [street, number, neighborhood, complement, reference]);
+
+  const canSubmit =
+    items.length > 0 &&
+    customerName.trim().length >= 2 &&
+    customerPhone.trim().length >= 8 &&
+    (fulfillment === "PICKUP" ||
+      (street.trim().length > 0 && neighborhood.trim().length > 0));
+
+  function handleFinish() {
+    const payload = {
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim(),
+      fulfillment,
+      addressText: fulfillment === "DELIVERY" ? addressText : undefined,
+      notes: notes.trim() || undefined,
+      items: items.map((i) => ({
+        name: i.product.name,
+        qty: i.qty,
+        unitPrice: i.product.price,
+      })),
+      subtotal,
+      deliveryFee,
+      totalEstimated,
+    };
+
+    const message = buildWhatsAppMessage(payload);
+    const url = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(
+      message
+    )}`;
+
+    window.open(url, "_blank", "noreferrer");
+  }
+
+  if (items.length === 0) {
+    return (
+      <main className="mx-auto max-w-3xl p-6">
+        <h1 className="text-2xl font-bold">Checkout</h1>
+        <p className="mt-3 text-zinc-400">Seu carrinho está vazio.</p>
+        <Link
+          href="/produtos"
+          className="mt-6 inline-block rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-700"
+        >
+          Ver produtos
+        </Link>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-3xl p-6">
+      <h1 className="text-2xl font-bold">Checkout</h1>
+      <p className="mt-2 text-zinc-400">
+        Preencha seus dados e finalize pelo WhatsApp.
+      </p>
+
+      {/* Aviso importante */}
+      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm text-zinc-300">
+        ⚠️ <b>Importante:</b> o <b>valor final pode variar</b> conforme peso e
+        disponibilidade. Confirmamos tudo no WhatsApp antes do pagamento via Pix.
+      </div>
+
+      {/* Dados do cliente */}
+      <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <h2 className="text-lg font-semibold">Seus dados</h2>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="text-sm text-zinc-300">Nome</label>
+            <input
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Ex: Guilherme"
+              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-zinc-300">Telefone (WhatsApp)</label>
+            <input
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              placeholder="Ex: 54999999999"
+              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Entrega/Retirada */}
+      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <h2 className="text-lg font-semibold">Entrega ou Retirada</h2>
+
+        <div className="mt-4 flex gap-3">
+          <button
+            type="button"
+            onClick={() => setFulfillment("DELIVERY")}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold border ${
+              fulfillment === "DELIVERY"
+                ? "bg-red-600 border-red-500"
+                : "bg-zinc-950 border-zinc-700 hover:bg-zinc-900"
+            }`}
+          >
+            Entrega (R$ 15,00)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFulfillment("PICKUP")}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold border ${
+              fulfillment === "PICKUP"
+                ? "bg-red-600 border-red-500"
+                : "bg-zinc-950 border-zinc-700 hover:bg-zinc-900"
+            }`}
+          >
+            Retirada a combinar
+          </button>
+        </div>
+
+        {fulfillment === "DELIVERY" && (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="text-sm text-zinc-300">Rua / Avenida</label>
+              <input
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="Ex: Rua X"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-zinc-300">Número</label>
+              <input
+                value={number}
+                onChange={(e) => setNumber(e.target.value)}
+                placeholder="Ex: 123"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-zinc-300">Bairro</label>
+              <input
+                value={neighborhood}
+                onChange={(e) => setNeighborhood(e.target.value)}
+                placeholder="Ex: Centro"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="text-sm text-zinc-300">Complemento</label>
+              <input
+                value={complement}
+                onChange={(e) => setComplement(e.target.value)}
+                placeholder="Apto, bloco, etc. (opcional)"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="text-sm text-zinc-300">Referência</label>
+              <input
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                placeholder="Ponto de referência (opcional)"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              />
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Observações */}
+      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <h2 className="text-lg font-semibold">Observações</h2>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Ex: horário para entrega/retirada, ponto de referência, etc."
+          className="mt-3 min-h-[90px] w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+        />
+      </section>
+
+      {/* Resumo */}
+      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <h2 className="text-lg font-semibold">Resumo</h2>
+
+        <div className="mt-3 space-y-2 text-sm text-zinc-300">
+          <div className="flex justify-between">
+            <span>Itens</span>
+            <span>{totalItems}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>{formatBRL(subtotal)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Taxa de entrega</span>
+            <span>{formatBRL(deliveryFee)}</span>
+          </div>
+          <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-zinc-800">
+            <span>Total estimado</span>
+            <span>{formatBRL(totalEstimated)}</span>
+          </div>
+        </div>
+
+        <div className="mt-5 flex gap-3">
+          <Link
+            href="/carrinho"
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-900"
+          >
+            Voltar ao carrinho
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleFinish}
+            disabled={!canSubmit}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+              canSubmit
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-zinc-700 cursor-not-allowed"
+            }`}
+          >
+            Finalizar no WhatsApp
+          </button>
+        </div>
+
+        {!canSubmit && (
+          <p className="mt-3 text-xs text-zinc-400">
+            Preencha nome, telefone e (se entrega) rua e bairro.
+          </p>
+        )}
+      </section>
+    </main>
+  );
+}
