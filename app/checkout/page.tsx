@@ -3,11 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
+import { siteConfig, formatBRL } from "../config/site";
 
 type Fulfillment = "DELIVERY" | "PICKUP";
 
-function formatBRL(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+function onlyDigits(value: string) {
+  return (value || "").replace(/\D/g, "");
 }
 
 function buildWhatsAppMessage(input: {
@@ -27,8 +28,8 @@ function buildWhatsAppMessage(input: {
 
   const fulfillmentLine =
     input.fulfillment === "DELIVERY"
-      ? `🚚 Entrega (taxa fixa ${formatBRL(input.deliveryFee)})`
-      : "🏪 Retirada a combinar";
+      ? `🚚 ${siteConfig.deliveryText}: ${formatBRL(input.deliveryFee)}`
+      : `🏪 ${siteConfig.pickupText}`;
 
   const addressBlock =
     input.fulfillment === "DELIVERY"
@@ -40,7 +41,7 @@ function buildWhatsAppMessage(input: {
     : [];
 
   return [
-    "Olá! Quero fazer um pedido no Guilhas Carnes & Assados 👋",
+    `Olá! Quero fazer um pedido no ${siteConfig.brandName} 👋`,
     "",
     `👤 Nome: ${input.customerName}`,
     `📞 Telefone: ${input.customerPhone}`,
@@ -49,24 +50,24 @@ function buildWhatsAppMessage(input: {
     ...lines,
     "",
     `Subtotal: ${formatBRL(input.subtotal)}`,
-    `${fulfillmentLine}`,
+    fulfillmentLine,
     ...(addressBlock.length ? ["", ...addressBlock] : []),
+    ...((notesBlock.length ? ["", ...notesBlock] : []) as string[]),
     "",
     `💰 Total estimado: ${formatBRL(input.totalEstimated)}`,
-    `✅ Confirmar disponibilidade e valor final no WhatsApp`,
-    `💳 Pagamento: Pix (após confirmação)`,
-    ...((notesBlock.length ? ["", ...notesBlock] : []) as string[]),
+    "⚠️ Valor final sujeito à confirmação (peso/estoque).",
+    "💳 Pagamento: Pix (após confirmação no WhatsApp).",
   ].join("\n");
 }
 
 export default function CheckoutPage() {
-  const { items, totalItems, totalPrice } = useCart(); // totalPrice aqui é SUBTOTAL
+  const { items, totalItems, totalPrice } = useCart(); // totalPrice = subtotal
   const [fulfillment, setFulfillment] = useState<Fulfillment>("DELIVERY");
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
-  // Endereço (simples)
+  // Endereço
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
@@ -75,12 +76,11 @@ export default function CheckoutPage() {
 
   const [notes, setNotes] = useState("");
 
-  const deliveryFee = fulfillment === "DELIVERY" ? 15 : 0;
   const subtotal = totalPrice;
+  const deliveryFee = fulfillment === "DELIVERY" ? siteConfig.deliveryFee : 0;
   const totalEstimated = subtotal + deliveryFee;
 
-  // Teu WhatsApp
-  const storeWhatsApp = "5554999320907";
+  const storeWhatsApp = siteConfig.whatsappPhone;
 
   const addressText = useMemo(() => {
     const parts = [
@@ -89,22 +89,36 @@ export default function CheckoutPage() {
       neighborhood.trim() ? `Bairro: ${neighborhood.trim()}` : "",
       complement.trim() ? `Compl.: ${complement.trim()}` : "",
       reference.trim() ? `Ref.: ${reference.trim()}` : "",
-      "Cidade: Caxias do Sul",
+      siteConfig.city ? `Cidade: ${siteConfig.city}` : "",
     ].filter(Boolean);
+
     return parts.join(" • ");
   }, [street, number, neighborhood, complement, reference]);
 
-  const canSubmit =
-    items.length > 0 &&
-    customerName.trim().length >= 2 &&
-    customerPhone.trim().length >= 8 &&
-    (fulfillment === "PICKUP" ||
-      (street.trim().length > 0 && neighborhood.trim().length > 0));
+  const canSubmit = useMemo(() => {
+    const hasItems = items.length > 0;
+    const okName = customerName.trim().length >= 2;
+    const okPhone = onlyDigits(customerPhone).length >= 10; // DDD + número
+    const okAddress =
+      fulfillment === "PICKUP" ||
+      (street.trim().length > 0 && neighborhood.trim().length > 0);
+
+    return hasItems && okName && okPhone && okAddress;
+  }, [
+    items.length,
+    customerName,
+    customerPhone,
+    fulfillment,
+    street,
+    neighborhood,
+  ]);
 
   function handleFinish() {
+    if (!canSubmit) return;
+
     const payload = {
       customerName: customerName.trim(),
-      customerPhone: customerPhone.trim(),
+      customerPhone: onlyDigits(customerPhone).trim(),
       fulfillment,
       addressText: fulfillment === "DELIVERY" ? addressText : undefined,
       notes: notes.trim() || undefined,
@@ -148,7 +162,6 @@ export default function CheckoutPage() {
         Preencha seus dados e finalize pelo WhatsApp.
       </p>
 
-      {/* Aviso importante */}
       <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm text-zinc-300">
         ⚠️ <b>Importante:</b> o <b>valor final pode variar</b> conforme peso e
         disponibilidade. Confirmamos tudo no WhatsApp antes do pagamento via Pix.
@@ -177,6 +190,9 @@ export default function CheckoutPage() {
               placeholder="Ex: 54999999999"
               className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
             />
+            <p className="mt-1 text-xs text-zinc-500">
+              Dica: informe com DDD (ex: 54...).
+            </p>
           </div>
         </div>
       </section>
@@ -195,7 +211,7 @@ export default function CheckoutPage() {
                 : "bg-zinc-950 border-zinc-700 hover:bg-zinc-900"
             }`}
           >
-            Entrega (R$ 15,00)
+            Entrega ({formatBRL(siteConfig.deliveryFee)})
           </button>
 
           <button
@@ -214,7 +230,7 @@ export default function CheckoutPage() {
         {fulfillment === "DELIVERY" && (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-sm text-zinc-300">Rua / Avenida</label>
+              <label className="text-sm text-zinc-300">Rua / Avenida *</label>
               <input
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
@@ -234,7 +250,7 @@ export default function CheckoutPage() {
             </div>
 
             <div>
-              <label className="text-sm text-zinc-300">Bairro</label>
+              <label className="text-sm text-zinc-300">Bairro *</label>
               <input
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
