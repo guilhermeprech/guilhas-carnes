@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "../cart-context";
 
 export function Header() {
@@ -10,14 +11,24 @@ export function Header() {
     <header className="border-b border-black-800 bg-white-950">
       <div className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
         {/* Marca */}
-        <Link href="/" className="block">
-          <h1 className="text-lg sm:text-xl font-bold text-black">
-            Guilhas Carnes & Assados
-          </h1>
-          <p className="text-xs sm:text-sm text-black-400">
-            Carnes selecionadas • Caxias do Sul
-          </p>
-        </Link>
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/brand/logo.png"
+              alt="Guilhas Carnes & Assados"
+              width={48}
+              height={48}
+              priority
+            />
+
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold text-black">
+                Guilhas Carnes & Assados
+              </h1>
+              <p className="text-xs sm:text-sm text-black-400">
+                Carnes selecionadas • Eventos de churrasco e burger • Caxias do Sul
+              </p>
+            </div>
+          </Link>
 
         {/* Navegação */}
         <nav className="flex items-center gap-5 text-sm text-black-800">
@@ -31,7 +42,7 @@ export function Header() {
 
           <Link
             href="/carrinho"
-            className="relative hover:text-red flex items-center gap-2"
+            className="relative hover:text-red-600 flex items-center gap-2"
           >
             <span>Carrinho</span>
 
