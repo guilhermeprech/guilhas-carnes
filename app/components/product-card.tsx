@@ -27,7 +27,7 @@ export function ProductCard({ product }: { product: Product }) {
 
       <div className="mt-4 flex items-center justify-between">
         <button
-          className="rounded-lg border border-red-600 bg-white px-4 py-2 text-sm font-semibold tracking-wide text-black hover:bg-red-600"
+          className="rounded-lg border border-red-600 bg-white px-4 py-2 text-sm font-semibold tracking-wide text-black hover:bg-red-600 hover:scale-105 transition-all hover:text-white"
           onClick={() => addItem(product)}
         >
           Adicionar

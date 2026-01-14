@@ -20,7 +20,7 @@ export function Header() {
               priority
             />
 
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-lg sm:text-xl font-bold text-black">
                 Guilhas Carnes & Assados
               </h1>

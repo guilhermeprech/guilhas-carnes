@@ -27,18 +27,18 @@ export default function CarrinhoPage() {
             {items.map((item) => (
               <li
                 key={item.product.id}
-                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900 p-4"
+                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-300/40 p-4"
               >
                 <div>
                   <p className="font-semibold">{item.product.name}</p>
-                  <p className="text-sm text-zinc-400">
+                  <p className="text-sm text-zinc-600">
                     {item.qty}x {formatBRL(item.product.price)} (Valor médio por unidade)
                   </p>
                 </div>
 
                 <button
                   onClick={() => removeItem(item.product.id)}
-                  className="text-sm text-red-500 hover:text-red-400"
+                  className="text-sm text-red-500 hover:text-red-400 tracking-wide hover:scale-105 transition-all"
                 >
                   Remover
                 </button>
@@ -46,7 +46,7 @@ export default function CarrinhoPage() {
             ))}
           </ul>
 
-          <div className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+          <div className="mt-6 rounded-lg border border-zinc-800 bg-zinc-300/40 p-4">
             <p>Total de itens: {totalItems}</p>
             <p className="text-lg font-bold">Total aproximado: {formatBRL(totalPrice)}</p>
           </div>
@@ -54,14 +54,14 @@ export default function CarrinhoPage() {
           <div className="mt-6 flex gap-4">
             <Link
               href="/checkout"
-              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold hover:bg-green-700"
+              className="rounded-lg bg-green-600 px-4 py-2 text-sm text-white font-semibold hover:bg-green-700 hover:scale-105 transition-all"
             >
               Ir para Checkout
             </Link>
 
             <button
               onClick={clear}
-              className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-800"
+              className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-red-600 hover:bg-red-600 hover:text-white hover:scale-105 transition-all"
             >
               Limpar carrinho
             </button>
