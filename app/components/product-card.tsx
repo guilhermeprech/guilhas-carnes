@@ -33,9 +33,10 @@ export function ProductCard({ product }: { product: Product }) {
           Adicionar
         </button>
 
-        <button className="text-sm text-zinc-300 hover:text-white" type="button">
-          Ver detalhes
-        </button>
+        <span className="text-sm text-zinc-500">
+        {formatBRL(product.pricePerKg)} / kg <br /> {product.avgWeightG}g (peso médio por unidade)
+        </span>
+        
       </div>
     </div>
   );
