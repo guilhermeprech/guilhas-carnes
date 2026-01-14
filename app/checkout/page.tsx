@@ -303,7 +303,7 @@ export default function CheckoutPage() {
             <span>{totalItems}</span>
           </div>
           <div className="flex justify-between">
-            <span>Subtotal</span>
+            <span>Subtotal estimado</span>
             <span>{formatBRL(subtotal)}</span>
           </div>
           <div className="flex justify-between">
