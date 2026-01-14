@@ -3,7 +3,7 @@ export const siteConfig = {
     brandName: "Guilhas Carnes & Assados",
   
     // WhatsApp do estabelecimento (somente números, com DDI + DDD)
-    whatsappPhone: "554999320907",
+    whatsappPhone: "5554999320907",
   
     // Regras do pedido
     deliveryFee: 15,
