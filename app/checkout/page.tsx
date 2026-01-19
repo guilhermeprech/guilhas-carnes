@@ -158,37 +158,37 @@ export default function CheckoutPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-bold">Checkout</h1>
-      <p className="mt-2 text-zinc-400">
+      <p className="mt-2 text-black">
         Preencha seus dados e finalize pelo WhatsApp.
       </p>
 
-      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm text-zinc-300">
+      <div className="mt-6 mb-6 rounded-md border border-red-600 bg-red-600 px-4 py-3 text-sm text-center text-white">
         ⚠️ <b>Importante:</b> o <b>valor final pode variar</b> conforme peso e
-        disponibilidade. Confirmamos tudo no WhatsApp antes do pagamento via Pix.
+        disponibilidade. Confirmamos tudo no WhatsApp antes do pagamento.
       </div>
 
       {/* Dados do cliente */}
-      <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-300/40 p-5">
         <h2 className="text-lg font-semibold">Seus dados</h2>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="text-sm text-zinc-300">Nome</label>
+            <label className="text-sm text-zinc-800">Nome</label>
             <input
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="Ex: Guilherme"
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
             />
           </div>
 
           <div>
-            <label className="text-sm text-zinc-300">Telefone (WhatsApp)</label>
+            <label className="text-sm text-zinc-800">Telefone (WhatsApp)</label>
             <input
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
               placeholder="Ex: 54999999999"
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+              className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
             />
             <p className="mt-1 text-xs text-zinc-500">
               Dica: informe com DDD (ex: 54...).
@@ -198,7 +198,7 @@ export default function CheckoutPage() {
       </section>
 
       {/* Entrega/Retirada */}
-      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-300/40 p-5">
         <h2 className="text-lg font-semibold">Entrega ou Retirada</h2>
 
         <div className="mt-4 flex gap-3">
@@ -207,8 +207,8 @@ export default function CheckoutPage() {
             onClick={() => setFulfillment("DELIVERY")}
             className={`rounded-lg px-4 py-2 text-sm font-semibold border ${
               fulfillment === "DELIVERY"
-                ? "bg-red-600 border-red-500"
-                : "bg-zinc-950 border-zinc-700 hover:bg-zinc-900"
+                ? "bg-white border-black hover:scale-105"
+                : "bg-zinc-400 border-black hover:bg-white hover:scale-105"
             }`}
           >
             Entrega ({formatBRL(siteConfig.deliveryFee)})
@@ -219,8 +219,8 @@ export default function CheckoutPage() {
             onClick={() => setFulfillment("PICKUP")}
             className={`rounded-lg px-4 py-2 text-sm font-semibold border ${
               fulfillment === "PICKUP"
-                ? "bg-red-600 border-red-500"
-                : "bg-zinc-950 border-zinc-700 hover:bg-zinc-900"
+                ? "bg-white border-black hover:scale-105"
+                : "bg-zinc-400 border-black hover:bg-white hover:scale-105"
             }`}
           >
             Retirada a combinar
@@ -230,52 +230,52 @@ export default function CheckoutPage() {
         {fulfillment === "DELIVERY" && (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-sm text-zinc-300">Rua / Avenida *</label>
+              <label className="text-sm text-black">Rua / Avenida *</label>
               <input
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
                 placeholder="Ex: Rua X"
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
               />
             </div>
 
             <div>
-              <label className="text-sm text-zinc-300">Número</label>
+              <label className="text-sm text-black">Número</label>
               <input
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 placeholder="Ex: 123"
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
               />
             </div>
 
             <div>
-              <label className="text-sm text-zinc-300">Bairro *</label>
+              <label className="text-sm text-black">Bairro *</label>
               <input
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
                 placeholder="Ex: Centro"
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="text-sm text-zinc-300">Complemento</label>
+              <label className="text-sm text-black">Complemento</label>
               <input
                 value={complement}
                 onChange={(e) => setComplement(e.target.value)}
                 placeholder="Apto, bloco, etc. (opcional)"
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="text-sm text-zinc-300">Referência</label>
+              <label className="text-sm text-black">Referência</label>
               <input
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
                 placeholder="Ponto de referência (opcional)"
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
               />
             </div>
           </div>
@@ -283,21 +283,21 @@ export default function CheckoutPage() {
       </section>
 
       {/* Observações */}
-      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-300/40 p-5">
         <h2 className="text-lg font-semibold">Observações</h2>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Ex: horário para entrega/retirada, ponto de referência, etc."
-          className="mt-3 min-h-[90px] w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+          className="mt-3 min-h-[90px] w-full rounded-lg border border-zinc-700 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500"
         />
       </section>
 
       {/* Resumo */}
-      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <section className="mt-4 rounded-xl border border-zinc-800 bg-zinc-300/40 p-5">
         <h2 className="text-lg font-semibold">Resumo</h2>
 
-        <div className="mt-3 space-y-2 text-sm text-zinc-300">
+        <div className="mt-3 space-y-2 text-sm text-black">
           <div className="flex justify-between">
             <span>Itens</span>
             <span>{totalItems}</span>
@@ -310,7 +310,7 @@ export default function CheckoutPage() {
             <span>Taxa de entrega</span>
             <span>{formatBRL(deliveryFee)}</span>
           </div>
-          <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-zinc-800">
+          <div className="flex justify-between text-base font-bold text-black pt-2 border-t border-zinc-800">
             <span>Total estimado</span>
             <span>{formatBRL(totalEstimated)}</span>
           </div>
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
         <div className="mt-5 flex gap-3">
           <Link
             href="/carrinho"
-            className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-900"
+            className="rounded-lg border border-zinc-700 bg-zinc-400 px-4 py-2 text-sm hover:bg-white hover:scale-105"
           >
             Voltar ao carrinho
           </Link>
@@ -328,10 +328,10 @@ export default function CheckoutPage() {
             type="button"
             onClick={handleFinish}
             disabled={!canSubmit}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+            className={`rounded-lg border border-zinc-700 rounded-lg px-4 py-2 text-sm font-semibold ${
               canSubmit
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-zinc-700 cursor-not-allowed"
+                ? "bg-white hover:bg-green-700 hover:text-white hover:scale-105"
+                : "bg-zinc-400 cursor-not-allowed hover:scale-105"
             }`}
           >
             Finalizar no WhatsApp

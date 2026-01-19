@@ -4,7 +4,7 @@ export default function Home() {
     <main className="min-h-screen bg-white text-black">
       <header className="mt-8 flex justify-center">
         <h1 className="text-3xl text-black">
-          Seu açougue de confiança na palma da sua mão!
+          Seu açougue de confiança na palma da mão!
         </h1>
         <p className="text-black">
           
