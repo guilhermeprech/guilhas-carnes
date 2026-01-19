@@ -37,44 +37,50 @@ export function Header() {
         )}
       >
         {/* MOBILE */}
-        <div className="flex md:hidden items-center justify-between">
-          {/* Espaço esquerdo (equilíbrio visual) */}
-          <div className="w-10" />
+<div className="md:hidden flex items-center justify-between gap-3">
+  {/* Marca à esquerda */}
+  <Link href="/" className="flex items-center gap-3">
+    <Image
+      src="/brand/logo.png"
+      alt="Guilhas Carnes & Assados"
+      width={compact ? 48 : 56}
+      height={compact ? 48 : 56}
+      priority
+      className="rounded-2xl transition-all"
+    />
 
-          {/* Marca centralizada */}
-          <Link href="/" className="flex flex-col items-center gap-1">
-            <Image
-              src="/brand/logo.png"
-              alt="Guilhas Carnes & Assados"
-              width={compact ? 56 : 64}
-              height={compact ? 56 : 64}
-              priority
-              className="rounded-2xl transition-all"
-            />
+    <div className="flex flex-col leading-tight">
+      <p className="text-xs font-semibold uppercase tracking-[0.26em] text-neutral-800">
+        Guilhas
+      </p>
+      <p className="text-xs text-neutral-600">
+        Carnes & Assados
+      </p>
+    </div>
+  </Link>
 
-            <div className="flex flex-col items-center leading-tight">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-700">
-                Guilhas
-              </p>
-              <p className="text-sm font-semibold text-neutral-900">
-                Carnes & Assados
-              </p>
-            </div>
-          </Link>
+  {/* Ações à direita */}
+  <div className="flex items-center gap-2">
+    <Link
+      href="/produtos"
+      className="inline-flex items-center justify-center rounded-2xl border border-neutral-300 bg-white/60 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-white/80 transition"
+    >
+      Produtos
+    </Link>
 
-          {/* Carrinho */}
-          <Link
-            href="/carrinho"
-            className="relative inline-flex items-center justify-center rounded-2xl border border-neutral-300 bg-white/60 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-white/80 transition"
-          >
-            Carrinho
-            {totalItems > 0 && (
-              <span className="ml-2 inline-flex min-w-[20px] h-[20px] items-center justify-center rounded-full bg-neutral-900 px-1.5 text-[11px] font-semibold text-white">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-        </div>
+    <Link
+      href="/carrinho"
+      className="inline-flex items-center justify-center rounded-2xl border border-neutral-300 bg-white/60 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-white/80 transition"
+    >
+      Carrinho
+      {totalItems > 0 && (
+        <span className="ml-2 inline-flex min-w-[20px] h-[20px] items-center justify-center rounded-full bg-neutral-900 px-1.5 text-[11px] font-semibold text-white">
+          {totalItems}
+        </span>
+      )}
+    </Link>
+  </div>
+</div>
 
         {/* DESKTOP */}
         <div className="hidden md:flex items-center justify-between gap-4">

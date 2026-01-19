@@ -3,112 +3,114 @@ import Image from "next/image";
 import Link from "next/link";
 import { products } from "./data/products";
 import { ProductCard } from "./components/product-card";
+import { Reveal } from "./components/reveal";
 
 export default function Home() {
   return (
     <main className="bg-[#F6F2EA] text-neutral-900">
-      <section className="px-5 md:px-10 pt-10 md:pt-16">
-        <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-          {/* Texto */}
-          <div>
-            <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
-              Guilhas Carnes & Assados
-            </p>
+      {/* HERO */}
+      <Reveal>
+        <section className="px-5 md:px-10 pt-10 md:pt-16">
+          <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+            {/* Texto */}
+            <div>
+              <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
+                Guilhas Carnes & Assados
+              </p>
 
-            <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
-              Carnes de qualidade <br className="hidden md:block" />
-              pro teu churrasco.
-            </h1>
+              <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
+                Carnes de qualidade <br className="hidden md:block" />
+                pro teu churrasco.
+              </h1>
 
-            <p className="mt-4 text-neutral-700 text-base md:text-lg">
-              Pronta entrega em Caxias do Sul. Monta teu pedido e a gente entrega
-              na tua porta.
-            </p>
+              <p className="mt-4 text-neutral-700 text-base md:text-lg">
+                Pronta entrega em Caxias do Sul. Monta teu pedido e a gente
+                entrega na tua porta.
+              </p>
 
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/produtos"
-                className="rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center"
-              >
-                Ver cortes disponíveis
-              </Link>
+              {/* CTA */}
+              <div className="mt-6">
+                <Link
+                  href="/produtos"
+                  className="block rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center"
+                >
+                  Ver cortes disponíveis
+                </Link>
+              </div>
 
-              <a
-                href="https://wa.me/55SEUNUMEROAQUI"
-                className="rounded-2xl px-5 py-3 border border-neutral-300 bg-white/60 backdrop-blur font-medium text-center"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Pedir no WhatsApp
-              </a>
+              {/* Chips */}
+              <div className="mt-5 flex flex-wrap gap-3 text-sm text-neutral-600 justify-center md:justify-start">
+                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                  Entrega em Caxias
+                </span>
+                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                  Taxa fixa R$ 15,00
+                </span>
+                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                  Retirada a combinar
+                </span>
+              </div>
             </div>
 
-            <div className="mt-5 flex gap-3 flex-wrap text-sm text-neutral-600">
-              <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
-                Entrega em Caxias
-              </span>
-              <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
-                Taxa fixa R$ 15,00
-              </span>
-              <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
-                Retirada a combinar
-              </span>
+            {/* Imagem */}
+            <div className="relative w-full h-[320px] md:h-[460px] overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
+              <Image
+                src="/images/hero.jpg"
+                alt="Churrasco Guilhas"
+                fill
+                priority
+                className="object-cover"
+              />
             </div>
           </div>
+        </section>
+      </Reveal>
 
-          {/* Imagem */}
-          <div className="relative w-full h-[320px] md:h-[460px] overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
-            <Image
-              src="/images/hero.jpg"
-              alt="Churrasco Guilhas"
-              fill
-              priority
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Destaques */}
+      {/* DESTAQUES */}
       <section className="px-5 md:px-10 mt-12 md:mt-16">
         <div className="mx-auto max-w-6xl grid md:grid-cols-3 gap-4">
           {[
             { title: "Seleção premium", desc: "Cortes escolhidos no padrão Guilhas." },
             { title: "Pronta entrega", desc: "Opções disponíveis pra hoje." },
             { title: "Entrega na porta", desc: "Compra fácil e rápida, sem complicação." },
-          ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm"
-            >
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="mt-2 text-neutral-700">{item.desc}</p>
-            </div>
+          ].map((item, idx) => (
+            <Reveal key={item.title} delayMs={idx * 90}>
+              <div className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm">
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="mt-2 text-neutral-700">{item.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      {/* Vitrine (puxa do products) */}
+      {/* VITRINE */}
       <section className="px-5 md:px-10 mt-12 md:mt-16 pb-16">
-        <div className="mx-auto max-w-6xl flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-semibold">Pronta entrega</h2>
-            <p className="mt-2 text-neutral-700">
-              Algumas opções pra garantir o churrasco.
-            </p>
-          </div>
+        <Reveal>
+          <div className="mx-auto max-w-6xl flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-semibold">
+                Pronta entrega
+              </h2>
+              <p className="mt-2 text-neutral-700">
+                Algumas opções pra garantir o churrasco.
+              </p>
+            </div>
 
-          <Link
-            href="/produtos"
-            className="text-sm font-medium underline underline-offset-4"
-          >
-            Ver catálogo completo
-          </Link>
-        </div>
+            <Link
+              href="/produtos"
+              className="text-sm font-medium underline underline-offset-4"
+            >
+              Ver catálogo completo
+            </Link>
+          </div>
+        </Reveal>
 
         <div className="mx-auto max-w-6xl mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.slice(0, 6).map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {products.slice(0, 6).map((product, idx) => (
+            <Reveal key={product.id} delayMs={idx * 70}>
+              <ProductCard product={product} />
+            </Reveal>
           ))}
         </div>
       </section>
