@@ -1,45 +1,116 @@
+// app/page.tsx
+import Image from "next/image";
 import Link from "next/link";
+import { products } from "./data/products";
+import { ProductCard } from "./components/product-card";
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-black">
-      <header className="mt-8 flex justify-center">
-        <h1 className="text-3xl text-black">
-          Seu açougue de confiança na palma da mão!
-        </h1>
-        <p className="text-black">
-          
-        </p>
-      </header>
+    <main className="bg-[#F6F2EA] text-neutral-900">
+      <section className="px-5 md:px-10 pt-10 md:pt-16">
+        <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+          {/* Texto */}
+          <div>
+            <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
+              Guilhas Carnes & Assados
+            </p>
 
-      <section className="mt-15 text-center flex justify-center">
-        
+            <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
+              Carnes de qualidade <br className="hidden md:block" />
+              pro teu churrasco.
+            </h1>
 
-      <div className="text-center">
-  <p className="text-xl text-black">
-    Compre produtos de qualidade para o seu churrasco e receba na porta da sua casa!
-  </p>
+            <p className="mt-4 text-neutral-700 text-base md:text-lg">
+              Pronta entrega em Caxias do Sul. Monta teu pedido e a gente entrega
+              na tua porta.
+            </p>
 
-  <div className="mt-15 flex justify-center">
-    <a
-      href="/produtos"
-      className="
-        rounded-xl
-        bg-red-600
-        px-10 py-4
-        text-lg
-        font-bold
-        tracking-wide
-        text-white
-        shadow-lg
-        hover:bg-red-700
-        hover:scale-105
-        transition-all
-      "
-    >
-      Conheça nossos produtos!
-    </a>
-  </div>
-</div>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/produtos"
+                className="rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center"
+              >
+                Ver cortes disponíveis
+              </Link>
+
+              <a
+                href="https://wa.me/55SEUNUMEROAQUI"
+                className="rounded-2xl px-5 py-3 border border-neutral-300 bg-white/60 backdrop-blur font-medium text-center"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Pedir no WhatsApp
+              </a>
+            </div>
+
+            <div className="mt-5 flex gap-3 flex-wrap text-sm text-neutral-600">
+              <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                Entrega em Caxias
+              </span>
+              <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                Taxa fixa R$ 15,00
+              </span>
+              <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                Retirada a combinar
+              </span>
+            </div>
+          </div>
+
+          {/* Imagem */}
+          <div className="relative w-full h-[320px] md:h-[460px] overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
+            <Image
+              src="/images/hero.jpg"
+              alt="Churrasco Guilhas"
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Destaques */}
+      <section className="px-5 md:px-10 mt-12 md:mt-16">
+        <div className="mx-auto max-w-6xl grid md:grid-cols-3 gap-4">
+          {[
+            { title: "Seleção premium", desc: "Cortes escolhidos no padrão Guilhas." },
+            { title: "Pronta entrega", desc: "Opções disponíveis pra hoje." },
+            { title: "Entrega na porta", desc: "Compra fácil e rápida, sem complicação." },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm"
+            >
+              <h3 className="text-lg font-semibold">{item.title}</h3>
+              <p className="mt-2 text-neutral-700">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Vitrine (puxa do products) */}
+      <section className="px-5 md:px-10 mt-12 md:mt-16 pb-16">
+        <div className="mx-auto max-w-6xl flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-semibold">Pronta entrega</h2>
+            <p className="mt-2 text-neutral-700">
+              Algumas opções pra garantir o churrasco.
+            </p>
+          </div>
+
+          <Link
+            href="/produtos"
+            className="text-sm font-medium underline underline-offset-4"
+          >
+            Ver catálogo completo
+          </Link>
+        </div>
+
+        <div className="mx-auto max-w-6xl mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {products.slice(0, 6).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </section>
     </main>
   );
