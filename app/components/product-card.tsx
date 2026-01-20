@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: Product }) {
             >
               {formatBRL(product.price)}
             </p>
-            <p className="text-xs text-neutral-600">por unidade</p>
+            <p className="text-xs text-neutral-600">aproximado <br /> por unidade</p>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export function ProductCard({ product }: { product: Product }) {
             {formatBRL(product.pricePerKg)} / kg
             <br />
             {product.avgWeightG}g{" "}
-            <span className="text-neutral-500">(peso médio)</span>
+            <span className="text-neutral-500">(peso médio por unidade)</span>
           </span>
         </div>
       </div>

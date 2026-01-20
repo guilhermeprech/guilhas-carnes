@@ -24,8 +24,9 @@ export default function Home() {
               </h1>
 
               <p className="mt-4 text-neutral-700 text-base md:text-lg">
-                Pronta entrega em Caxias do Sul. Monta teu pedido e a gente
-                entrega na tua porta.
+                Teu açougue de confiança na palma da mão.
+                <br />                  
+                Monta teu pedido e a gente entrega na porta da tua casa.
               </p>
 
               {/* CTA */}
@@ -41,11 +42,9 @@ export default function Home() {
               {/* Chips */}
               <div className="mt-5 flex flex-wrap gap-3 text-sm text-neutral-600 justify-center md:justify-start">
                 <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
-                  Entrega em Caxias
+                  Entrega taxa fixa R$ 15,00
                 </span>
-                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
-                  Taxa fixa R$ 15,00
-                </span>
+               
                 <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
                   Retirada a combinar
                 </span>
