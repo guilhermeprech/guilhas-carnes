@@ -8,28 +8,87 @@ import { Reveal } from "./components/reveal";
 export default function Home() {
   return (
     <main className="bg-[#F6F2EA] text-neutral-900">
-      {/* HERO */}
+
+      {/* EVENTOS (hero invertido) */}
       <Reveal>
         <section className="px-5 md:px-10 pt-10 md:pt-16">
+          <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+            {/* Imagem */}
+            <div className="relative w-full h-[320px] md:h-[460px] overflow-hidden rounded-3xl border border-neutral-200 shadow-sm order-2 md:order-1">
+              <Image
+                src="/images/eventos.jpg"
+                alt="Eventos Guilhas"
+                fill
+                priority
+                className="object-cover"
+              />
+            </div>
+
+            {/* Texto */}
+            <div className="order-1 md:order-2">
+              <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
+                Eventos
+              </p>
+
+              <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
+                Churrasco &amp; Burger
+                <br className="hidden md:block" />
+                no teu evento.
+              </h1>
+
+              <p className="mt-4 text-neutral-700 text-base md:text-lg">
+                Pra aniversários, empresas e confraternizações.
+                <br />
+                A gente monta tudo sob medida, com padrão Guilhas.
+              </p>
+
+              <div className="mt-6">
+                <Link
+                  href="/eventos"
+                  className="block rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center"
+                >
+                  Ver eventos
+                </Link>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-3 text-sm text-neutral-600 justify-center md:justify-start">
+                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                  Churrasco completo
+                </span>
+                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                  Burger na brasa
+                </span>
+                <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
+                  Sob medida
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* HERO (venda de carnes) */}
+      <Reveal delayMs={120}>
+        <section className="px-5 md:px-10 mt-12 md:mt-16">
           <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
             {/* Texto */}
             <div>
               <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
-                Guilhas Carnes & Assados
+                Produtos
               </p>
 
-              <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
-                Carnes de qualidade <br className="hidden md:block" />
+              <h2 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
+                Carnes de qualidade
+                <br className="hidden md:block" />
                 pro teu churrasco.
-              </h1>
+              </h2>
 
               <p className="mt-4 text-neutral-700 text-base md:text-lg">
                 Teu açougue de confiança na palma da mão.
-                <br />                  
+                <br />
                 Monta teu pedido e a gente entrega na porta da tua casa.
               </p>
 
-              {/* CTA */}
               <div className="mt-6">
                 <Link
                   href="/produtos"
@@ -39,12 +98,10 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Chips */}
               <div className="mt-5 flex flex-wrap gap-3 text-sm text-neutral-600 justify-center md:justify-start">
                 <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
                   Entrega taxa fixa R$ 15,00
                 </span>
-               
                 <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
                   Retirada a combinar
                 </span>
