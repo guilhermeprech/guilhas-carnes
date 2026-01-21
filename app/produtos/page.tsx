@@ -1,19 +1,98 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { products } from "../data/products";
+import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "../components/product-card";
 import { Reveal } from "../components/reveal";
+import { supabase } from "../../lib/supabase";
+import type { Product, Category, BovinosSubcategory } from "../data/products";
 
-type Category = "Todos" | "Bovinos" | "Ovinos" | "Outros";
-type BovinosSub = "Todas" | "Dia a dia" | "Churrasco";
+type CategoryFilter = "Todos" | Category;
+type BovinosSubFilter = "Todas" | BovinosSubcategory;
+
+type DbProduct = {
+  id: string;
+  name: string;
+  brand: string | null; // ✅ NOVO
+  description: string | null;
+  category: Category;
+  subcategory: BovinosSubcategory | null;
+  price_unit: number | null;
+  price_per_kg: number | null;
+  avg_weight_g: number | null;
+  image: string | null;
+};
+
+function mapDbToUi(p: DbProduct): Product {
+  return {
+    id: p.id,
+    name: p.name,
+    brand: p.brand ?? undefined, // ✅ NOVO
+    description: p.description ?? undefined,
+    category: p.category,
+    subcategory: p.subcategory ?? undefined,
+    price: Number(p.price_unit ?? 0),
+    pricePerKg: Number(p.price_per_kg ?? 0),
+    avgWeightG: Number(p.avg_weight_g ?? 0),
+    image: p.image ?? undefined,
+  };
+}
 
 export default function ProdutosPage() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>("Todos");
-  const [selectedSub, setSelectedSub] = useState<BovinosSub>("Todas");
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryFilter>("Todos");
+  const [selectedSub, setSelectedSub] = useState<BovinosSubFilter>("Todas");
+
+  const [items, setItems] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function load() {
+      setLoading(true);
+      setLoadError(null);
+
+      const { data, error } = await supabase
+        .from("products")
+        .select(
+          "id,name,brand,description,category,subcategory,price_unit,price_per_kg,avg_weight_g,image"
+        ) // ✅ brand aqui
+        .order("category", { ascending: true })
+        .order("name", { ascending: true });
+
+      if (!mounted) return;
+
+      if (error) {
+        setLoadError(error.message);
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+
+      const rows = (data as DbProduct[]) || [];
+
+      // debug rápido pra conferir se brand veio
+      const first = rows[0];
+      if (first) {
+        console.log("[SUPABASE products:first]", first);
+        if (!("brand" in first)) {
+          console.warn("[SUPABASE] Campo brand não veio no select()");
+        }
+      }
+
+      setItems(rows.map(mapDbToUi));
+      setLoading(false);
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
-    return products.filter((p) => {
+    return items.filter((p) => {
       const okCategory =
         selectedCategory === "Todos" || p.category === selectedCategory;
 
@@ -24,7 +103,7 @@ export default function ProdutosPage() {
 
       return okCategory && okSub;
     });
-  }, [selectedCategory, selectedSub]);
+  }, [items, selectedCategory, selectedSub]);
 
   return (
     <main className="min-h-screen bg-[#F6F2EA] px-5 md:px-10 py-10">
@@ -33,7 +112,7 @@ export default function ProdutosPage() {
         <Reveal delayMs={0}>
           <header className="text-center mb-10">
             <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
-              Guilhas Carnes & Assados
+              Guilhas Carnes &amp; Assados
             </p>
 
             <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-neutral-900">
@@ -55,6 +134,16 @@ export default function ProdutosPage() {
           </div>
         </Reveal>
 
+        {loading ? (
+          <div className="mb-8 text-center text-sm text-neutral-700">
+            Carregando produtos…
+          </div>
+        ) : loadError ? (
+          <div className="mb-8 text-center text-sm text-red-700">
+            Erro ao carregar produtos: {loadError}
+          </div>
+        ) : null}
+
         {/* Filtros */}
         <section className="mb-8 grid gap-4 md:grid-cols-2">
           <Reveal delayMs={80}>
@@ -64,7 +153,7 @@ export default function ProdutosPage() {
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {(["Todos", "Bovinos", "Ovinos", "Outros"] as Category[]).map(
+                {(["Todos", "Bovinos", "Ovinos", "Outros"] as CategoryFilter[]).map(
                   (c) => (
                     <button
                       key={c}
@@ -94,7 +183,7 @@ export default function ProdutosPage() {
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {(["Todas", "Dia a dia", "Churrasco"] as BovinosSub[]).map(
+                {(["Todas", "Dia a dia", "Churrasco"] as BovinosSubFilter[]).map(
                   (s) => {
                     const disabled = selectedCategory !== "Bovinos";
                     const active = selectedSub === s && !disabled;

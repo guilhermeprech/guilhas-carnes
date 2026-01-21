@@ -1,0 +1,18 @@
+id,name,description,category,subcategory,price_per_kg,avg_weight_g,price_unit,image,is_available
+alcatra,Alcatra,,Bovinos,Churrasco,76.57,900,68.91,,true
+assado-de-tira,Assado de tira,,Bovinos,Churrasco,93.47,800,74.78,,true
+bananinha,Bananinha,,Bovinos,Churrasco,77.87,400,31.15,,true
+contrafile,Contrafilé,,Bovinos,Churrasco,89.57,1000,89.57,,true
+costela,Costela,,Bovinos,Churrasco,64.87,1200,77.84,,true
+denver,Denver,,Bovinos,Churrasco,110.37,1000,110.37,,true
+entranha,Entranha,,Bovinos,Churrasco,77.87,400,31.15,,true
+entrecot,Entrecot,,Bovinos,Churrasco,100.1,1000,100.1,,true
+file-mignon,Filé Mignon,,Bovinos,Churrasco,118.3,1500,177.45,,true
+flat-iron,Flat Iron,,Bovinos,Churrasco,118.3,500,59.15,,true
+maminha,Maminha,,Bovinos,Churrasco,67.47,1100,74.22,,true
+picanha,Picanha,,Bovinos,Churrasco,118.3,900,106.47,,true
+prime-rib,Prime Rib,,Bovinos,Churrasco,98.8,700,69.16,,true
+short-rib,Short Rib,,Bovinos,Churrasco,64.87,700,45.41,,true
+shoulder,Shoulder,,Bovinos,Churrasco,60.97,1000,60.97,,true
+tomahawk,Tomahawk,,Bovinos,Churrasco,100.1,1600,160.16,,true
+vazio,Vazio,,Bovinos,Churrasco,83.07,1100,91.38,,true

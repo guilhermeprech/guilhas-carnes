@@ -5,6 +5,9 @@ export type Product = {
   id: string;
   name: string;
 
+  // NOVO
+  brand?: string;
+
   // preço usado no carrinho e no card (aprox. unidade)
   price: number;
 
@@ -17,7 +20,7 @@ export type Product = {
   // subcategoria apenas para Bovinos (Dia a dia / Churrasco)
   subcategory?: BovinosSubcategory;
 
-  // preparado pra futuro (não usado agora)
+  // preparado pra futuro
   image?: string;
   description?: string;
 };
@@ -50,6 +53,9 @@ const S = {
   churrasco: "Churrasco" as const,
 };
 
+// marca padrão (todos esses produtos)
+const BRAND = "Apebrun";
+
 export const products: Product[] = [
   // =========================
   // BOVINOS — CHURRASCO
@@ -57,6 +63,7 @@ export const products: Product[] = [
   {
     id: "alcatra",
     name: "Alcatra",
+    brand: BRAND,
     avgWeightG: 900,
     pricePerKg: brlToNumber("R$ 76,57"),
     price: approxUnitPrice(brlToNumber("R$ 76,57"), 900),
@@ -66,6 +73,7 @@ export const products: Product[] = [
   {
     id: "assado-de-tira",
     name: "Assado de tira",
+    brand: BRAND,
     avgWeightG: 800,
     pricePerKg: brlToNumber("R$ 93,47"),
     price: approxUnitPrice(brlToNumber("R$ 93,47"), 800),
@@ -75,6 +83,7 @@ export const products: Product[] = [
   {
     id: "bananinha",
     name: "Bananinha",
+    brand: BRAND,
     avgWeightG: 400,
     pricePerKg: brlToNumber("R$ 77,87"),
     price: approxUnitPrice(brlToNumber("R$ 77,87"), 400),
@@ -84,6 +93,7 @@ export const products: Product[] = [
   {
     id: "contrafile",
     name: "Contrafilé",
+    brand: BRAND,
     avgWeightG: 1000,
     pricePerKg: brlToNumber("R$ 89,57"),
     price: approxUnitPrice(brlToNumber("R$ 89,57"), 1000),
@@ -93,6 +103,7 @@ export const products: Product[] = [
   {
     id: "costela",
     name: "Costela",
+    brand: BRAND,
     avgWeightG: 1200,
     pricePerKg: brlToNumber("R$ 64,87"),
     price: approxUnitPrice(brlToNumber("R$ 64,87"), 1200),
@@ -102,6 +113,7 @@ export const products: Product[] = [
   {
     id: "denver",
     name: "Denver",
+    brand: BRAND,
     avgWeightG: 1000,
     pricePerKg: brlToNumber("R$ 110,37"),
     price: approxUnitPrice(brlToNumber("R$ 110,37"), 1000),
@@ -111,6 +123,7 @@ export const products: Product[] = [
   {
     id: "entranha",
     name: "Entranha",
+    brand: BRAND,
     avgWeightG: 400,
     pricePerKg: brlToNumber("R$ 77,87"),
     price: approxUnitPrice(brlToNumber("R$ 77,87"), 400),
@@ -120,6 +133,7 @@ export const products: Product[] = [
   {
     id: "entrecot",
     name: "Entrecot",
+    brand: BRAND,
     avgWeightG: 1000,
     pricePerKg: brlToNumber("R$ 100,10"),
     price: approxUnitPrice(brlToNumber("R$ 100,10"), 1000),
@@ -129,6 +143,7 @@ export const products: Product[] = [
   {
     id: "file-mignon",
     name: "Filé Mignon",
+    brand: BRAND,
     avgWeightG: 1500,
     pricePerKg: brlToNumber("R$ 118,30"),
     price: approxUnitPrice(brlToNumber("R$ 118,30"), 1500),
@@ -138,6 +153,7 @@ export const products: Product[] = [
   {
     id: "flat-iron",
     name: "Flat Iron",
+    brand: BRAND,
     avgWeightG: 500,
     pricePerKg: brlToNumber("R$ 118,30"),
     price: approxUnitPrice(brlToNumber("R$ 118,30"), 500),
@@ -147,6 +163,7 @@ export const products: Product[] = [
   {
     id: "maminha",
     name: "Maminha",
+    brand: BRAND,
     avgWeightG: 1100,
     pricePerKg: brlToNumber("R$ 67,47"),
     price: approxUnitPrice(brlToNumber("R$ 67,47"), 1100),
@@ -156,6 +173,7 @@ export const products: Product[] = [
   {
     id: "picanha",
     name: "Picanha",
+    brand: BRAND,
     avgWeightG: 900,
     pricePerKg: brlToNumber("R$ 118,30"),
     price: approxUnitPrice(brlToNumber("R$ 118,30"), 900),
@@ -165,6 +183,7 @@ export const products: Product[] = [
   {
     id: "prime-rib",
     name: "Prime Rib",
+    brand: BRAND,
     avgWeightG: 700,
     pricePerKg: brlToNumber("R$ 98,80"),
     price: approxUnitPrice(brlToNumber("R$ 98,80"), 700),
@@ -174,6 +193,7 @@ export const products: Product[] = [
   {
     id: "short-rib",
     name: "Short Rib",
+    brand: BRAND,
     avgWeightG: 700,
     pricePerKg: brlToNumber("R$ 64,87"),
     price: approxUnitPrice(brlToNumber("R$ 64,87"), 700),
@@ -183,6 +203,7 @@ export const products: Product[] = [
   {
     id: "shoulder",
     name: "Shoulder",
+    brand: BRAND,
     avgWeightG: 1000,
     pricePerKg: brlToNumber("R$ 60,97"),
     price: approxUnitPrice(brlToNumber("R$ 60,97"), 1000),
@@ -192,6 +213,7 @@ export const products: Product[] = [
   {
     id: "tomahawk",
     name: "Tomahawk",
+    brand: BRAND,
     avgWeightG: 1600,
     pricePerKg: brlToNumber("R$ 100,10"),
     price: approxUnitPrice(brlToNumber("R$ 100,10"), 1600),
@@ -201,50 +223,11 @@ export const products: Product[] = [
   {
     id: "vazio",
     name: "Vazio",
+    brand: BRAND,
     avgWeightG: 1100,
     pricePerKg: brlToNumber("R$ 83,07"),
     price: approxUnitPrice(brlToNumber("R$ 83,07"), 1100),
     category: C.bovinos,
     subcategory: S.churrasco,
   },
-
-  // =========================
-  // BOVINOS — DIA A DIA
-  // (aqui tu vai adicionar depois)
-  // =========================
-  // {
-  //   id: "patinho",
-  //   name: "Patinho",
-  //   avgWeightG: 1000,
-  //   pricePerKg: brlToNumber("R$ 00,00"),
-  //   price: approxUnitPrice(brlToNumber("R$ 00,00"), 1000),
-  //   category: C.bovinos,
-  //   subcategory: S.diaADia,
-  // },
-
-  // =========================
-  // OVINOS
-  // (sem subcategoria)
-  // =========================
-  // {
-  //   id: "cordeiro-pernil",
-  //   name: "Pernil de Cordeiro",
-  //   avgWeightG: 1500,
-  //   pricePerKg: brlToNumber("R$ 00,00"),
-  //   price: approxUnitPrice(brlToNumber("R$ 00,00"), 1500),
-  //   category: C.ovinos,
-  // },
-
-  // =========================
-  // OUTROS
-  // (sem subcategoria)
-  // =========================
-  // {
-  //   id: "linguica",
-  //   name: "Linguiça Artesanal",
-  //   avgWeightG: 500,
-  //   pricePerKg: brlToNumber("R$ 00,00"),
-  //   price: approxUnitPrice(brlToNumber("R$ 00,00"), 500),
-  //   category: C.outros,
-  // },
 ];
