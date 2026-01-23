@@ -142,118 +142,116 @@ type CustomSelections = {
 };
 
 function buildWhatsAppMessage(input: {
-    type: EventType;
-  
-    date: string;
-    period: Period;
-    people: number;
-    address?: string;
-  
-    churrasMenu?: ChurrasMenu;
-    customSelections?: CustomSelections;
-  
-    burgerQuantities?: { id: string; name: string; qty: number; price: number }[];
-  
-    extraNotes?: string;
-  }) {
-    const lines: string[] = [];
-  
-    lines.push(`Olá! Quero orçar um evento com o ${siteConfig.brandName} 👋`);
-    lines.push("");
-    lines.push(
-      input.type === "CHURRASCO"
-        ? "🔥 Orçamento — Churrasco"
-        : "🍔 Orçamento — Hambúrguer"
-    );
-    lines.push("");
-    lines.push(`📅 Data: ${formatDateBR(input.date)}`);
-    lines.push(`🕒 Período: ${labelPeriod(input.period)}`);
-    lines.push(`👥 Pessoas (estimativa): ${input.people}`);
-  
-    if (input.address?.trim()) {
-      lines.push(`📍 Endereço (opcional): ${input.address.trim()}`);
-    }
-  
-    // CHURRASCO
-    if (input.type === "CHURRASCO") {
-      const menu = input.churrasMenu || "TRADICIONAL";
-      lines.push("");
-      lines.push(`🥩 Cardápio: ${labelChurrasMenu(menu)}`);
-  
-      // ✅ Tradicional/Premium: não enviar itens
-      if (menu === "TRADICIONAL") {
-        lines.push(`💰 Valor: R$ ${churrasTradicional.pricePerPerson} por pessoa`);
-      }
-  
-      if (menu === "PREMIUM") {
-        lines.push(`💰 Valor: R$ ${churrasPremium.pricePerPerson} por pessoa`);
-      }
-  
-      // ✅ Personalizado: enviar seleção completa
-      if (menu === "PERSONALIZADO") {
-        const s = input.customSelections;
-  
-        lines.push("");
-        lines.push("🧩 Personalizado — seleção escolhida:");
-  
-        lines.push("• Entradas e acompanhamentos:");
-        lines.push(
-          ...(s?.entradasEAcomp?.length
-            ? s.entradasEAcomp.map((x) => ` - ${x}`)
-            : [" - (não selecionado)"])
-        );
-  
-        lines.push("• Carnes (gado):");
-        lines.push(
-          ...(s?.carnesGado?.length
-            ? s.carnesGado.map((x) => ` - ${x}`)
-            : [" - (não selecionado)"])
-        );
-  
-        lines.push("• Carnes (cordeiro):");
-        lines.push(
-          ...(s?.carnesCordeiro?.length
-            ? s.carnesCordeiro.map((x) => ` - ${x}`)
-            : [" - (não selecionado)"])
-        );
-  
-        lines.push("• Sobremesas:");
-        lines.push(
-          ...(s?.sobremesas?.length
-            ? s.sobremesas.map((x) => ` - ${x}`)
-            : [" - (não selecionado)"])
-        );
-      }
-    }
-  
-    // BURGER
-    if (input.type === "BURGER") {
-      lines.push("");
-      lines.push("🍔 Seleção de hambúrgueres:");
-  
-      const chosen = (input.burgerQuantities || []).filter((x) => x.qty > 0);
-      if (!chosen.length) {
-        lines.push(" - (não selecionado)");
-      } else {
-        chosen.forEach((x) => {
-          lines.push(` - ${x.qty}x ${x.name} (R$ ${x.price})`);
-        });
-        lines.push("");
-        
-      }
-    }
-  
-    if (input.extraNotes?.trim()) {
-      lines.push("");
-      lines.push(`📝 Observações: ${input.extraNotes.trim()}`);
-    }
-  
-    lines.push("");
-    lines.push("Pode me passar valores finais e disponibilidade?");
-  
-    return lines.join("\n");
+  type: EventType;
+
+  date: string;
+  period: Period;
+  people: number;
+  address?: string;
+
+  churrasMenu?: ChurrasMenu;
+  customSelections?: CustomSelections;
+
+  burgerQuantities?: { id: string; name: string; qty: number; price: number }[];
+
+  extraNotes?: string;
+}) {
+  const lines: string[] = [];
+
+  lines.push(`Olá! Quero orçar um evento com o ${siteConfig.brandName} 👋`);
+  lines.push("");
+  lines.push(
+    input.type === "CHURRASCO"
+      ? "🔥 Orçamento — Churrasco"
+      : "🍔 Orçamento — Hambúrguer"
+  );
+  lines.push("");
+  lines.push(`📅 Data: ${formatDateBR(input.date)}`);
+  lines.push(`🕒 Período: ${labelPeriod(input.period)}`);
+  lines.push(`👥 Pessoas (estimativa): ${input.people}`);
+
+  if (input.address?.trim()) {
+    lines.push(`📍 Endereço (opcional): ${input.address.trim()}`);
   }
 
+  // CHURRASCO
+  if (input.type === "CHURRASCO") {
+    const menu = input.churrasMenu || "TRADICIONAL";
+    lines.push("");
+    lines.push(`🥩 Cardápio: ${labelChurrasMenu(menu)}`);
+
+    // ✅ Tradicional/Premium: não enviar itens
+    if (menu === "TRADICIONAL") {
+      lines.push(`💰 Valor: R$ ${churrasTradicional.pricePerPerson} por pessoa`);
+    }
+
+    if (menu === "PREMIUM") {
+      lines.push(`💰 Valor: R$ ${churrasPremium.pricePerPerson} por pessoa`);
+    }
+
+    // ✅ Personalizado: enviar seleção completa
+    if (menu === "PERSONALIZADO") {
+      const s = input.customSelections;
+
+      lines.push("");
+      lines.push("🧩 Personalizado — seleção escolhida:");
+
+      lines.push("• Entradas e acompanhamentos:");
+      lines.push(
+        ...(s?.entradasEAcomp?.length
+          ? s.entradasEAcomp.map((x) => ` - ${x}`)
+          : [" - (não selecionado)"])
+      );
+
+      lines.push("• Carnes (gado):");
+      lines.push(
+        ...(s?.carnesGado?.length
+          ? s.carnesGado.map((x) => ` - ${x}`)
+          : [" - (não selecionado)"])
+      );
+
+      lines.push("• Carnes (cordeiro):");
+      lines.push(
+        ...(s?.carnesCordeiro?.length
+          ? s.carnesCordeiro.map((x) => ` - ${x}`)
+          : [" - (não selecionado)"])
+      );
+
+      lines.push("• Sobremesas:");
+      lines.push(
+        ...(s?.sobremesas?.length
+          ? s.sobremesas.map((x) => ` - ${x}`)
+          : [" - (não selecionado)"])
+      );
+    }
+  }
+
+  // BURGER
+  if (input.type === "BURGER") {
+    lines.push("");
+    lines.push("🍔 Seleção de hambúrgueres:");
+
+    const chosen = (input.burgerQuantities || []).filter((x) => x.qty > 0);
+    if (!chosen.length) {
+      lines.push(" - (não selecionado)");
+    } else {
+      chosen.forEach((x) => {
+        lines.push(` - ${x.qty}x ${x.name} (R$ ${x.price})`);
+      });
+      lines.push("");
+    }
+  }
+
+  if (input.extraNotes?.trim()) {
+    lines.push("");
+    lines.push(`📝 Observações: ${input.extraNotes.trim()}`);
+  }
+
+  lines.push("");
+  lines.push("Pode me passar valores finais e disponibilidade?");
+
+  return lines.join("\n");
+}
 
 function ToggleList(props: {
   title: string;
@@ -402,7 +400,7 @@ export default function EventosPage() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <Reveal>
-          <header className="text-center mb-10">
+          <header className="text-center mb-6 md:mb-10">
             <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
               Guilhas Carnes &amp; Assados
             </p>
@@ -417,336 +415,335 @@ export default function EventosPage() {
           </header>
         </Reveal>
 
-        {/* Seletor */}
+        {/* ✅ Seletor + Detalhes juntos no MESMO Reveal */}
         <Reveal delayMs={60}>
-          <section className="mb-8 rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-4 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.14em] text-neutral-600 mb-3">
-              Tipo de evento
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setType("CHURRASCO")}
-                className={cx(
-                  "rounded-2xl px-4 py-2 text-sm border transition",
-                  type === "CHURRASCO"
-                    ? "bg-neutral-900 text-white border-neutral-900"
-                    : "bg-white/60 text-neutral-900 border-neutral-300 hover:bg-white/80"
-                )}
-              >
-                Churrasco
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setType("BURGER")}
-                className={cx(
-                  "rounded-2xl px-4 py-2 text-sm border transition",
-                  type === "BURGER"
-                    ? "bg-neutral-900 text-white border-neutral-900"
-                    : "bg-white/60 text-neutral-900 border-neutral-300 hover:bg-white/80"
-                )}
-              >
-                Hambúrguer
-              </button>
-
-              <div className="flex-1" />
-
-              <Link
-                href="/"
-                className="rounded-2xl px-4 py-2 text-sm border bg-white/60 text-neutral-900 border-neutral-300 hover:bg-white/80 transition"
-              >
-                Voltar ao início
-              </Link>
-            </div>
-          </section>
-        </Reveal>
-
-        {/* Detalhes do tipo */}
-        {type === "CHURRASCO" ? (
-          <Reveal delayMs={90}>
-            <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm">
-              <h2 className="text-2xl font-semibold">Churrasco</h2>
-              <p className="mt-2 text-neutral-700">
-                Equipe, preparo e serviço. Ideal para aniversários, empresas e
-                confraternizações.
+          <div className="space-y-6">
+            {/* Seletor */}
+            <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.14em] text-neutral-600 mb-3">
+                Tipo de evento
               </p>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {([
-                  {
-                    key: "TRADICIONAL",
-                    title: "Tradicional",
-                    price: "R$ 135 por pessoa",
-                    desc: "Cardápio completo com cortes selecionados.",
-                  },
-                  {
-                    key: "PREMIUM",
-                    title: "Premium",
-                    price: "R$ 170 por pessoa",
-                    desc: "Seleção mais nobre e experiência ainda mais completa.",
-                  },
-                  {
-                    key: "PERSONALIZADO",
-                    title: "Personalizado",
-                    price: "Sob consulta",
-                    desc: "Monte seu cardápio escolhendo itens.",
-                  },
-                ] as const).map((m) => {
-                  const active = churrasMenu === (m.key as ChurrasMenu);
-                  return (
-                    <button
-                      key={m.key}
-                      type="button"
-                      onClick={() => setChurrasMenu(m.key as ChurrasMenu)}
-                      className={cx(
-                        "text-left rounded-3xl border p-5 transition",
-                        active
-                          ? "border-neutral-900 bg-white/70"
-                          : "border-neutral-200 bg-white/50 hover:bg-white/70"
-                      )}
-                    >
-                      <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
-                        Cardápio
-                      </p>
-                      <h3 className="mt-2 text-lg font-semibold">{m.title}</h3>
-                      <p className="mt-1 text-sm text-neutral-700">{m.price}</p>
-                      <p className="mt-2 text-sm text-neutral-700">{m.desc}</p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Resumo tradicional/premium */}
-              {churrasMenu !== "PERSONALIZADO" && (
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-3xl border border-neutral-200 bg-white/50 p-5">
-                    <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
-                      Itens
-                    </p>
-                    <h3 className="mt-2 font-semibold text-neutral-900">
-                      {churrasMenu === "TRADICIONAL"
-                        ? "Tradicional"
-                        : "Premium"}
-                    </h3>
-
-                    <div className="mt-3 text-sm text-neutral-700 space-y-3">
-                      <div>
-                        <p className="font-medium">Entradas</p>
-                        <ul className="mt-1 list-disc pl-5">
-                          {(churrasMenu === "TRADICIONAL"
-                            ? churrasTradicional.entradas
-                            : churrasPremium.entradas
-                          ).map((x) => (
-                            <li key={x}>{x}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Acompanhamentos</p>
-                        <ul className="mt-1 list-disc pl-5">
-                          {(churrasMenu === "TRADICIONAL"
-                            ? churrasTradicional.acompanhamentos
-                            : churrasPremium.acompanhamentos
-                          ).map((x) => (
-                            <li key={x}>{x}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Carnes</p>
-                        <ul className="mt-1 list-disc pl-5">
-                          {(churrasMenu === "TRADICIONAL"
-                            ? churrasTradicional.carnes
-                            : churrasPremium.carnes
-                          ).map((x) => (
-                            <li key={x}>{x}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Sobremesa</p>
-                        <ul className="mt-1 list-disc pl-5">
-                          {(churrasMenu === "TRADICIONAL"
-                            ? churrasTradicional.sobremesa
-                            : churrasPremium.sobremesa
-                          ).map((x) => (
-                            <li key={x}>{x}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <p className="text-xs text-neutral-600">
-                        Obs.: Crianças de 6 a 12 anos pagam 60% do valor.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-3xl border border-neutral-200 bg-white/50 p-5">
-                    <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
-                      Próximo passo
-                    </p>
-                    <h3 className="mt-2 font-semibold text-neutral-900">
-                      Faça o orçamento
-                    </h3>
-                    <p className="mt-2 text-sm text-neutral-700">
-                      Preencha o formulário com data, período e quantidade de
-                      pessoas para enviarmos a proposta.
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={scrollToForm}
-                      className="mt-4 w-full rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center hover:opacity-95 transition"
-                    >
-                      Orçar evento
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Personalizado */}
-              {churrasMenu === "PERSONALIZADO" && (
-                <div className="mt-6 grid gap-4">
-                  <ToggleList
-                    title="Entradas e acompanhamentos"
-                    options={customOptions.entradasEAcomp}
-                    selected={custom.entradasEAcomp}
-                    onChange={(next) =>
-                      setCustom((prev) => ({ ...prev, entradasEAcomp: next }))
-                    }
-                  />
-
-                  <ToggleList
-                    title="Carnes (gado)"
-                    options={customOptions.carnesGado}
-                    selected={custom.carnesGado}
-                    onChange={(next) =>
-                      setCustom((prev) => ({ ...prev, carnesGado: next }))
-                    }
-                  />
-
-                  <ToggleList
-                    title="Carnes (cordeiro)"
-                    options={customOptions.carnesCordeiro}
-                    selected={custom.carnesCordeiro}
-                    onChange={(next) =>
-                      setCustom((prev) => ({ ...prev, carnesCordeiro: next }))
-                    }
-                  />
-
-                  <ToggleList
-                    title="Sobremesas"
-                    options={customOptions.sobremesas}
-                    selected={custom.sobremesas}
-                    onChange={(next) =>
-                      setCustom((prev) => ({ ...prev, sobremesas: next }))
-                    }
-                  />
-
-                  <div className="rounded-3xl border border-neutral-200 bg-white/50 p-5">
-                    <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
-                      Próximo passo
-                    </p>
-                    <h3 className="mt-2 font-semibold text-neutral-900">
-                      Faça o orçamento
-                    </h3>
-                    <p className="mt-2 text-sm text-neutral-700">
-                      Depois de selecionar os itens, preencha o formulário e
-                      envie o orçamento no WhatsApp.
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={scrollToForm}
-                      className="mt-4 w-full rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center hover:opacity-95 transition"
-                    >
-                      Orçar evento
-                    </button>
-
-                    <p className="mt-3 text-xs text-neutral-600">
-                      Dica: selecione ao menos 1 item para conseguir enviar.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </section>
-          </Reveal>
-        ) : (
-          <Reveal delayMs={90}>
-            <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm">
-              <h2 className="text-2xl font-semibold">Hambúrguer</h2>
-              <p className="mt-2 text-neutral-700">
-                O evento é cobrado pelo número de unidades contratadas.
-                Recomendação: <b>1,5</b> hambúrguer por pessoa.
-              </p>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {burgerMenu.map((b) => (
-                  <div
-                    key={b.id}
-                    className="rounded-3xl border border-neutral-200 bg-white/50 p-5"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="text-lg font-semibold">{b.name}</h3>
-                        <p className="mt-2 text-sm text-neutral-700">{b.desc}</p>
-                      </div>
-
-                      <div className="text-right shrink-0">
-                        <p className="text-lg font-semibold">R${b.price}</p>
-                        <p className="text-xs text-neutral-600">por unidade</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="text-sm text-neutral-800">
-                        Quantidade (mín. 10 se escolher)
-                      </label>
-                      <input
-                        inputMode="numeric"
-                        value={qty[b.id]}
-                        onChange={(e) =>
-                          setQty((prev) => ({ ...prev, [b.id]: e.target.value }))
-                        }
-                        placeholder="0"
-                        className="mt-1 w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-neutral-500"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 rounded-3xl border border-neutral-200 bg-white/50 p-5">
-                <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
-                  Importante
-                </p>
-                <p className="mt-2 text-sm text-neutral-700">
-                  Mínimo <b>10 unidades</b> de cada sabor escolhido.
-                </p>
-
-                {!minBurgerOk && (
-                  <p className="mt-2 text-xs text-neutral-600">
-                    Para enviar, escolha ao menos 1 sabor e coloque no mínimo 10
-                    unidades nele.
-                  </p>
-                )}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setType("CHURRASCO")}
+                  className={cx(
+                    "rounded-2xl px-4 py-2 text-sm border transition",
+                    type === "CHURRASCO"
+                      ? "bg-neutral-900 text-white border-neutral-900"
+                      : "bg-white/60 text-neutral-900 border-neutral-300 hover:bg-white/80"
+                  )}
+                >
+                  Churrasco
+                </button>
 
                 <button
                   type="button"
-                  onClick={scrollToForm}
-                  className="mt-4 w-full rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center hover:opacity-95 transition"
+                  onClick={() => setType("BURGER")}
+                  className={cx(
+                    "rounded-2xl px-4 py-2 text-sm border transition",
+                    type === "BURGER"
+                      ? "bg-neutral-900 text-white border-neutral-900"
+                      : "bg-white/60 text-neutral-900 border-neutral-300 hover:bg-white/80"
+                  )}
                 >
-                  Orçar evento
+                  Hambúrguer
                 </button>
+
+                <div className="flex-1" />
+
+                <Link
+                  href="/"
+                  className="rounded-2xl px-4 py-2 text-sm border bg-white/60 text-neutral-900 border-neutral-300 hover:bg-white/80 transition"
+                >
+                  Voltar ao início
+                </Link>
               </div>
             </section>
-          </Reveal>
-        )}
+
+            {/* Detalhes do tipo (SEM Reveal separado) */}
+            {type === "CHURRASCO" ? (
+              <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm">
+                <h2 className="text-2xl font-semibold">Churrasco</h2>
+                <p className="mt-2 text-neutral-700">
+                  Equipe, preparo e serviço. Ideal para aniversários, empresas e
+                  confraternizações.
+                </p>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-3">
+                  {([
+                    {
+                      key: "TRADICIONAL",
+                      title: "Tradicional",
+                      price: "R$ 135 por pessoa",
+                      desc: "Cardápio completo com cortes selecionados.",
+                    },
+                    {
+                      key: "PREMIUM",
+                      title: "Premium",
+                      price: "R$ 170 por pessoa",
+                      desc: "Seleção mais nobre e experiência ainda mais completa.",
+                    },
+                    {
+                      key: "PERSONALIZADO",
+                      title: "Personalizado",
+                      price: "Sob consulta",
+                      desc: "Monte seu cardápio escolhendo itens.",
+                    },
+                  ] as const).map((m) => {
+                    const active = churrasMenu === (m.key as ChurrasMenu);
+                    return (
+                      <button
+                        key={m.key}
+                        type="button"
+                        onClick={() => setChurrasMenu(m.key as ChurrasMenu)}
+                        className={cx(
+                          "text-left rounded-3xl border p-5 transition",
+                          active
+                            ? "border-neutral-900 bg-white/70"
+                            : "border-neutral-200 bg-white/50 hover:bg-white/70"
+                        )}
+                      >
+                        <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
+                          Cardápio
+                        </p>
+                        <h3 className="mt-2 text-lg font-semibold">{m.title}</h3>
+                        <p className="mt-1 text-sm text-neutral-700">
+                          {m.price}
+                        </p>
+                        <p className="mt-2 text-sm text-neutral-700">{m.desc}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Resumo tradicional/premium */}
+                {churrasMenu !== "PERSONALIZADO" && (
+                  <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    <div className="rounded-3xl border border-neutral-200 bg-white/50 p-5">
+                      <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
+                        Itens
+                      </p>
+                      <h3 className="mt-2 font-semibold text-neutral-900">
+                        {churrasMenu === "TRADICIONAL" ? "Tradicional" : "Premium"}
+                      </h3>
+
+                      <div className="mt-3 text-sm text-neutral-700 space-y-3">
+                        <div>
+                          <p className="font-medium">Entradas</p>
+                          <ul className="mt-1 list-disc pl-5">
+                            {(churrasMenu === "TRADICIONAL"
+                              ? churrasTradicional.entradas
+                              : churrasPremium.entradas
+                            ).map((x) => (
+                              <li key={x}>{x}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="font-medium">Acompanhamentos</p>
+                          <ul className="mt-1 list-disc pl-5">
+                            {(churrasMenu === "TRADICIONAL"
+                              ? churrasTradicional.acompanhamentos
+                              : churrasPremium.acompanhamentos
+                            ).map((x) => (
+                              <li key={x}>{x}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="font-medium">Carnes</p>
+                          <ul className="mt-1 list-disc pl-5">
+                            {(churrasMenu === "TRADICIONAL"
+                              ? churrasTradicional.carnes
+                              : churrasPremium.carnes
+                            ).map((x) => (
+                              <li key={x}>{x}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="font-medium">Sobremesa</p>
+                          <ul className="mt-1 list-disc pl-5">
+                            {(churrasMenu === "TRADICIONAL"
+                              ? churrasTradicional.sobremesa
+                              : churrasPremium.sobremesa
+                            ).map((x) => (
+                              <li key={x}>{x}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <p className="text-xs text-neutral-600">
+                          Obs.: Crianças de 6 a 12 anos pagam 60% do valor.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-neutral-200 bg-white/50 p-5">
+                      <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
+                        Próximo passo
+                      </p>
+                      <h3 className="mt-2 font-semibold text-neutral-900">
+                        Faça o orçamento
+                      </h3>
+                      <p className="mt-2 text-sm text-neutral-700">
+                        Preencha o formulário com data, período e quantidade de
+                        pessoas para enviarmos a proposta.
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={scrollToForm}
+                        className="mt-4 w-full rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center hover:opacity-95 transition"
+                      >
+                        Orçar evento
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Personalizado */}
+                {churrasMenu === "PERSONALIZADO" && (
+                  <div className="mt-6 grid gap-4">
+                    <ToggleList
+                      title="Entradas e acompanhamentos"
+                      options={customOptions.entradasEAcomp}
+                      selected={custom.entradasEAcomp}
+                      onChange={(next) =>
+                        setCustom((prev) => ({ ...prev, entradasEAcomp: next }))
+                      }
+                    />
+
+                    <ToggleList
+                      title="Carnes (gado)"
+                      options={customOptions.carnesGado}
+                      selected={custom.carnesGado}
+                      onChange={(next) =>
+                        setCustom((prev) => ({ ...prev, carnesGado: next }))
+                      }
+                    />
+
+                    <ToggleList
+                      title="Carnes (cordeiro)"
+                      options={customOptions.carnesCordeiro}
+                      selected={custom.carnesCordeiro}
+                      onChange={(next) =>
+                        setCustom((prev) => ({ ...prev, carnesCordeiro: next }))
+                      }
+                    />
+
+                    <ToggleList
+                      title="Sobremesas"
+                      options={customOptions.sobremesas}
+                      selected={custom.sobremesas}
+                      onChange={(next) =>
+                        setCustom((prev) => ({ ...prev, sobremesas: next }))
+                      }
+                    />
+
+                    <div className="rounded-3xl border border-neutral-200 bg-white/50 p-5">
+                      <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
+                        Próximo passo
+                      </p>
+                      <h3 className="mt-2 font-semibold text-neutral-900">
+                        Faça o orçamento
+                      </h3>
+                      <p className="mt-2 text-sm text-neutral-700">
+                        Depois de selecionar os itens, preencha o formulário e
+                        envie o orçamento no WhatsApp.
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={scrollToForm}
+                        className="mt-4 w-full rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center hover:opacity-95 transition"
+                      >
+                        Orçar evento
+                      </button>
+
+                      <p className="mt-3 text-xs text-neutral-600">
+                        Dica: selecione ao menos 1 item para conseguir enviar.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </section>
+            ) : (
+              <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm">
+                <h2 className="text-2xl font-semibold">Hambúrguer</h2>
+                <p className="mt-2 text-neutral-700">
+                  O evento é cobrado pelo número de unidades contratadas.
+                  Recomendação: <b>1,5</b> hambúrguer por pessoa.
+                </p>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  {burgerMenu.map((b) => (
+                    <div
+                      key={b.id}
+                      className="rounded-3xl border border-neutral-200 bg-white/50 p-5"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-semibold">{b.name}</h3>
+                          <p className="mt-2 text-sm text-neutral-700">{b.desc}</p>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <p className="text-lg font-semibold">R${b.price}</p>
+                          <p className="text-xs text-neutral-600">por unidade</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <label className="text-sm text-neutral-800">
+                          Quantidade (mín. 10 se escolher)
+                        </label>
+                        <input
+                          inputMode="numeric"
+                          value={qty[b.id]}
+                          onChange={(e) =>
+                            setQty((prev) => ({ ...prev, [b.id]: e.target.value }))
+                          }
+                          placeholder="0"
+                          className="mt-1 w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-neutral-500"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 rounded-3xl border border-neutral-200 bg-white/50 p-5">
+                  <p className="text-xs uppercase tracking-[0.14em] text-neutral-600">
+                    Importante
+                  </p>
+                  <p className="mt-2 text-sm text-neutral-700">
+                    Mínimo <b>10 unidades</b> de cada sabor escolhido.
+                  </p>
+
+                  {!minBurgerOk && (
+                    <p className="mt-2 text-xs text-neutral-600">
+                      Para enviar, escolha ao menos 1 sabor e coloque no mínimo 10
+                      unidades nele.
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={scrollToForm}
+                    className="mt-4 w-full rounded-2xl px-5 py-3 bg-neutral-900 text-white font-medium text-center hover:opacity-95 transition"
+                  >
+                    Orçar evento
+                  </button>
+                </div>
+              </section>
+            )}
+          </div>
+        </Reveal>
 
         {/* FORM */}
         <div ref={formRef} className="mt-10" />

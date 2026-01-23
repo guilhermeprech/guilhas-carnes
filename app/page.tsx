@@ -1,14 +1,27 @@
+"use client";
+
 // app/page.tsx
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "./data/products";
-import { ProductCard } from "./components/product-card";
 import { Reveal } from "./components/reveal";
+import { HomeVitrine } from "./components/home-vitrine";
 
 export default function Home() {
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  useEffect(() => {
+    function onScroll() {
+      setShowScrollHint(window.scrollY < 40);
+    }
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <main className="bg-[#F6F2EA] text-neutral-900">
-
       {/* EVENTOS (hero invertido) */}
       <Reveal>
         <section className="px-5 md:px-10 pt-10 md:pt-16">
@@ -32,8 +45,7 @@ export default function Home() {
 
               <h1 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
                 Churrasco &amp; Burger
-                <br className="hidden md:block" />
-                no teu evento.
+                <br /> no teu evento.
               </h1>
 
               <p className="mt-4 text-neutral-700 text-base md:text-lg">
@@ -61,6 +73,35 @@ export default function Home() {
                 <span className="rounded-full border border-neutral-300 px-3 py-1 bg-white/60">
                   Sob medida
                 </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ✅ Scroll hint NO FLUXO (não sobrepõe conteúdo no mobile) */}
+          <div className="mx-auto max-w-6xl">
+            {/* Mantém um espacinho fixo pra não “pular” layout quando some */}
+            <div className="h-10 mt-4 md:mt-6 flex justify-center">
+              <div
+                className={`transition-all duration-300 ${
+                  showScrollHint
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2 pointer-events-none"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.scrollTo({
+                      top: window.innerHeight * 0.85,
+                      behavior: "smooth",
+                    })
+                  }
+                  className="flex flex-col items-center gap-1 text-xs text-neutral-600 hover:text-neutral-900 transition"
+                  aria-label="Rolar para ver mais conteúdo"
+                >
+                  <span className="tracking-wide">ver mais</span>
+                  <span className="animate-bounce text-lg leading-none">↓</span>
+                </button>
               </div>
             </div>
           </div>
@@ -140,7 +181,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VITRINE */}
+      {/* VITRINE (agora puxa do Supabase) */}
       <section className="px-5 md:px-10 mt-12 md:mt-16 pb-16">
         <Reveal>
           <div className="mx-auto max-w-6xl flex items-end justify-between gap-4">
@@ -162,13 +203,7 @@ export default function Home() {
           </div>
         </Reveal>
 
-        <div className="mx-auto max-w-6xl mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.slice(0, 6).map((product, idx) => (
-            <Reveal key={product.id} delayMs={idx * 70}>
-              <ProductCard product={product} />
-            </Reveal>
-          ))}
-        </div>
+        <HomeVitrine />
       </section>
     </main>
   );
