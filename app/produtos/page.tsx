@@ -37,14 +37,43 @@ function mapDbToUi(p: DbProduct): Product {
   };
 }
 
+function normalizeText(v: string) {
+  return (v || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .trim();
+}
+
+function useIsDesktopLg() {
+  const [isLg, setIsLg] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)"); // lg
+    const update = () => setIsLg(mq.matches);
+
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  return isLg;
+}
+
 export default function ProdutosPage() {
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryFilter>("Todos");
   const [selectedSub, setSelectedSub] = useState<BovinosSubFilter>("Todas");
 
+  // Busca
+  const [query, setQuery] = useState("");
+
   const [items, setItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  const isDesktopLg = useIsDesktopLg();
+  const firstBatchCount = isDesktopLg ? 3 : 1;
 
   useEffect(() => {
     let mounted = true;
@@ -71,16 +100,6 @@ export default function ProdutosPage() {
       }
 
       const rows = (data as DbProduct[]) || [];
-
-      // debug rápido pra conferir se brand veio
-      const first = rows[0];
-      if (first) {
-        console.log("[SUPABASE products:first]", first);
-        if (!("brand" in first)) {
-          console.warn("[SUPABASE] Campo brand não veio no select()");
-        }
-      }
-
       setItems(rows.map(mapDbToUi));
       setLoading(false);
     }
@@ -92,6 +111,8 @@ export default function ProdutosPage() {
   }, []);
 
   const filtered = useMemo(() => {
+    const q = normalizeText(query);
+
     return items.filter((p) => {
       const okCategory =
         selectedCategory === "Todos" || p.category === selectedCategory;
@@ -101,17 +122,30 @@ export default function ProdutosPage() {
         selectedSub === "Todas" ||
         p.subcategory === selectedSub;
 
-      return okCategory && okSub;
+      const okQuery =
+        q.length === 0 ||
+        normalizeText(p.name).includes(q) ||
+        normalizeText(p.brand ?? "").includes(q) ||
+        normalizeText(p.description ?? "").includes(q);
+
+      return okCategory && okSub && okQuery;
     });
-  }, [items, selectedCategory, selectedSub]);
+  }, [items, selectedCategory, selectedSub, query]);
 
-  // ✅ Mobile: primeira fileira = 1 card
-  const firstRowMobile = filtered.slice(0, 1);
-  const restMobile = filtered.slice(1);
+  const qTrim = query.trim();
+  const isSearching = qTrim.length > 0;
 
-  // ✅ Desktop (lg+): primeira fileira = 3 cards
-  const firstRowDesktop = filtered.slice(0, 3);
-  const restDesktop = filtered.slice(3);
+  // ✅ Primeiro “bloco” de cards que vai junto com filtros/busca
+  const firstBatch = useMemo(
+    () => filtered.slice(0, firstBatchCount),
+    [filtered, firstBatchCount]
+  );
+
+  // ✅ Resto dos cards (com ou sem reveal)
+  const rest = useMemo(
+    () => filtered.slice(firstBatchCount),
+    [filtered, firstBatchCount]
+  );
 
   return (
     <main className="min-h-screen bg-[#F6F2EA] px-5 md:px-10 py-10">
@@ -130,6 +164,16 @@ export default function ProdutosPage() {
             <p className="mt-4 text-neutral-700 text-base md:text-lg">
               Entrega em Caxias do Sul (taxa fixa R$ 15,00) • Retirada a combinar
             </p>
+
+            <div className="mt-6 flex justify-center">
+              <a
+                href="#filtros"
+                className="inline-flex items-center gap-2 text-xs text-neutral-600 hover:text-neutral-900 transition"
+              >
+                Role para ver os cortes
+                <span className="animate-bounce">↓</span>
+              </a>
+            </div>
           </header>
         </Reveal>
 
@@ -152,11 +196,38 @@ export default function ProdutosPage() {
           </div>
         ) : null}
 
-        {/* ✅ Filtros + contagem + primeira fileira no MESMO Reveal */}
-        <Reveal delayMs={80}>
-          <div className="space-y-6">
+        {/* ✅ TUDO JUNTO NO MESMO REVEAL: busca + filtros + contagem + 1ª “fileira” */}
+        <Reveal delayMs={70}>
+          <div id="filtros">
+            {/* Busca */}
+            <div className="mb-6 rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.14em] text-neutral-600 mb-3">
+                Pesquisar
+              </p>
+
+              <div className="relative">
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Digite o nome do corte (ex: picanha, maminha...)"
+                  className="w-full rounded-2xl border border-neutral-300 bg-white/70 px-4 py-3 pr-14 text-sm outline-none focus:border-neutral-500"
+                />
+
+                {qTrim.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 hover:text-neutral-900 transition"
+                    aria-label="Limpar busca"
+                  >
+                    limpar
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Filtros */}
-            <section className="grid gap-4 md:grid-cols-2">
+            <section className="mb-8 grid gap-4 md:grid-cols-2">
               <div className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-[0.14em] text-neutral-600 mb-3">
                   Categoria
@@ -226,50 +297,40 @@ export default function ProdutosPage() {
             </section>
 
             {/* Contagem */}
-            <div className="text-center text-sm text-neutral-700">
+            <div className="mb-6 text-center text-sm text-neutral-700">
               Exibindo <span className="font-medium">{filtered.length}</span>{" "}
               produto(s)
+              {qTrim.length > 0 && (
+                <>
+                  {" "}
+                  para <span className="font-medium">“{qTrim}”</span>
+                </>
+              )}
             </div>
 
-            {/* ✅ Primeira fileira (mobile: 1) */}
-            {!loading && !loadError && firstRowMobile.length > 0 && (
-              <section className="grid gap-6 lg:hidden">
-                {firstRowMobile.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </section>
-            )}
-
-            {/* ✅ Primeira fileira (desktop lg+: 3) */}
-            {!loading && !loadError && firstRowDesktop.length > 0 && (
-              <section className="hidden lg:grid gap-6 lg:grid-cols-3">
-                {firstRowDesktop.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </section>
-            )}
+            {/* ✅ Primeiros cards junto com o Reveal (sem Reveal individual) */}
+            <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {firstBatch.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </section>
           </div>
         </Reveal>
 
-        {/* ✅ Restante (mobile: começa do 2º item) */}
-        {!loading && !loadError && restMobile.length > 0 && (
-          <section className="mt-6 grid gap-6 sm:grid-cols-2 lg:hidden">
-            {restMobile.map((product, idx) => (
-              <Reveal key={product.id} delayMs={idx * 30}>
-                <ProductCard product={product} />
-              </Reveal>
-            ))}
-          </section>
-        )}
+        {/* ✅ Resto: com Reveal só quando NÃO estiver pesquisando */}
+        {rest.length > 0 && (
+          <section className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {rest.map((product, i) => {
+              if (isSearching) {
+                return <ProductCard key={product.id} product={product} />;
+              }
 
-        {/* ✅ Restante (desktop lg+: começa do 4º item) */}
-        {!loading && !loadError && restDesktop.length > 0 && (
-          <section className="mt-6 hidden lg:grid gap-6 lg:grid-cols-3">
-            {restDesktop.map((product, idx) => (
-              <Reveal key={product.id} delayMs={idx * 30}>
-                <ProductCard product={product} />
-              </Reveal>
-            ))}
+              return (
+                <Reveal key={product.id} delayMs={i * 30}>
+                  <ProductCard product={product} />
+                </Reveal>
+              );
+            })}
           </section>
         )}
       </div>

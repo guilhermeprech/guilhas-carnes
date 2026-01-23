@@ -780,8 +780,7 @@ export default function EventosPage() {
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="mt-1 w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-neutral-500"
-                />
+                  className="mt-1 w-full max-w-full md:max-w-[220px] rounded-2xl border border-neutral-300 bg-white px-3 py-3 text-sm outline-none focus:border-neutral-500"                />
               </div>
 
               <div>
