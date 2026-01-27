@@ -1,6 +1,7 @@
 import "./globals.css";
 import { CartProvider } from "./cart-context";
 import { Header } from "./components/Header";
+import { CartBottomBar } from "./components/cartBottomBar";
 
 export const metadata = {
   title: "Guilhas Carnes & Assados",
@@ -51,6 +52,7 @@ export default function RootLayout({
         <CartProvider>
           <Header />
           {children}
+          <CartBottomBar />
         </CartProvider>
       </body>
     </html>

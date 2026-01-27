@@ -10,9 +10,15 @@ export type CartItem = {
 
 type CartContextValue = {
   items: CartItem[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
+
+  // ações
+  addItem: (product: Product) => void;          // +1 (se não existir, cria)
+  decrement: (productId: string) => void;       // -1 (se chegar em 0, remove)
+  setQty: (productId: string, qty: number) => void; // seta quantidade (0 remove)
+  removeItem: (productId: string) => void;      // remove item do carrinho
   clear: () => void;
+
+  // totais
   totalItems: number;
   totalPrice: number;
 };
@@ -59,6 +65,43 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   }
 
+  function decrement(productId: string) {
+    setItems((prev) => {
+      const idx = prev.findIndex((x) => x.product.id === productId);
+      if (idx < 0) return prev;
+
+      const copy = [...prev];
+      const nextQty = copy[idx].qty - 1;
+
+      if (nextQty <= 0) {
+        copy.splice(idx, 1);
+        return copy;
+      }
+
+      copy[idx] = { ...copy[idx], qty: nextQty };
+      return copy;
+    });
+  }
+
+  function setQty(productId: string, qty: number) {
+    const q = Math.max(0, Math.floor(qty || 0));
+
+    setItems((prev) => {
+      const idx = prev.findIndex((x) => x.product.id === productId);
+      if (idx < 0) {
+        // Não cria item aqui porque não temos o "product" completo nesse método.
+        // (o addItem continua sendo o caminho pra inserir novo)
+        return prev;
+      }
+
+      if (q === 0) return prev.filter((x) => x.product.id !== productId);
+
+      const copy = [...prev];
+      copy[idx] = { ...copy[idx], qty: q };
+      return copy;
+    });
+  }
+
   function removeItem(productId: string) {
     setItems((prev) => prev.filter((x) => x.product.id !== productId));
   }
@@ -70,6 +113,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value: CartContextValue = {
     items,
     addItem,
+    decrement,
+    setQty,
     removeItem,
     clear,
     totalItems,
