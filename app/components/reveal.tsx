@@ -8,11 +8,7 @@ type RevealProps = {
   delayMs?: number;
 };
 
-export function Reveal({
-  children,
-  className = "",
-  delayMs = 0,
-}: RevealProps) {
+export function Reveal({ children, className = "", delayMs = 0 }: RevealProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -20,21 +16,45 @@ export function Reveal({
     const el = ref.current;
     if (!el) return;
 
+    // Se o usuário prefere reduzir animações, mostra direto
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+    if (reduced) {
+      setVisible(true);
+      return;
+    }
+
+    // Fallback caso o browser não suporte IntersectionObserver
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      setVisible(true);
+      return;
+    }
+
+    // ✅ MUITO IMPORTANTE:
+    // threshold baixo porque o Reveal pode envolver um container alto (página inteira)
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting || entry.intersectionRatio > 0) {
           setVisible(true);
           observer.disconnect();
         }
       },
       {
-        threshold: 0.25,          // só anima quando está mais visível
-        rootMargin: "0px 0px -80px 0px", // “espera” mais um pouco
+        threshold: 0, // dispara assim que encostar na viewport
+        // dispara um pouco antes (top +80px), e não “segura” demais no bottom
+        rootMargin: "80px 0px 0px 0px",
       }
     );
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    // garante que layout já calculou antes de observar (ajuda em alguns casos)
+    const raf = requestAnimationFrame(() => observer.observe(el));
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -42,11 +62,8 @@ export function Reveal({
       ref={ref}
       style={{ transitionDelay: `${delayMs}ms` }}
       className={[
-        // MAIS LENTO + MAIS SUAVE
-        "transition-all duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
-        visible
-          ? "opacity-100 translate-y-0 scale-100"
-          : "opacity-0 translate-y-10 scale-[0.96]",
+        "transition-all duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
         className,
       ].join(" ")}
     >
