@@ -1,6 +1,5 @@
 "use client";
 
-// app/page.tsx
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -49,7 +48,7 @@ export default function Home() {
               </h1>
 
               <p className="mt-4 text-neutral-700 text-base md:text-lg">
-                Pra aniversários, empresas e confraternizações.
+                Para aniversários, empresas e confraternizações.
                 <br />
                 A gente monta tudo sob medida, com padrão Guilhas.
               </p>
@@ -76,40 +75,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* ✅ Scroll hint NO FLUXO (não sobrepõe conteúdo no mobile) */}
-          <div className="mx-auto max-w-6xl">
-            {/* Mantém um espacinho fixo pra não “pular” layout quando some */}
-            <div className="h-10 mt-4 md:mt-6 flex justify-center">
-              <div
-                className={`transition-all duration-300 ${
-                  showScrollHint
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-2 pointer-events-none"
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    window.scrollTo({
-                      top: window.innerHeight * 0.85,
-                      behavior: "smooth",
-                    })
-                  }
-                  className="flex flex-col items-center gap-1 text-xs text-neutral-600 hover:text-neutral-900 transition"
-                  aria-label="Rolar para ver mais conteúdo"
-                >
-                  <span className="tracking-wide">ver mais</span>
-                  <span className="animate-bounce text-lg leading-none">↓</span>
-                </button>
-              </div>
-            </div>
-          </div>
         </section>
-      </Reveal>
 
       {/* HERO (venda de carnes) */}
-      <Reveal delayMs={120}>
         <section className="px-5 md:px-10 mt-12 md:mt-16">
           <div className="mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
             {/* Texto */}
@@ -161,7 +129,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </Reveal>
 
       {/* DESTAQUES */}
       <section className="px-5 md:px-10 mt-12 md:mt-16">
@@ -183,7 +150,6 @@ export default function Home() {
 
       {/* VITRINE (agora puxa do Supabase) */}
       <section className="px-5 md:px-10 mt-12 md:mt-16 pb-16">
-        <Reveal>
           <div className="mx-auto max-w-6xl flex items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl md:text-3xl font-semibold">
@@ -201,10 +167,10 @@ export default function Home() {
               Ver catálogo completo
             </Link>
           </div>
-        </Reveal>
 
         <HomeVitrine />
       </section>
+      </Reveal>
     </main>
   );
 }

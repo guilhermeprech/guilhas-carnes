@@ -149,9 +149,10 @@ export default function ProdutosPage() {
 
   return (
     <main className="min-h-screen bg-[#F6F2EA] px-5 md:px-10 py-10">
+      <Reveal>
+
       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <Reveal delayMs={0}>
           <header className="text-center mb-10">
             <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
               Guilhas Carnes &amp; Assados
@@ -164,27 +165,15 @@ export default function ProdutosPage() {
             <p className="mt-4 text-neutral-700 text-base md:text-lg">
               Entrega em Caxias do Sul (taxa fixa R$ 15,00) • Retirada a combinar
             </p>
-
-            <div className="mt-6 flex justify-center">
-              <a
-                href="#filtros"
-                className="inline-flex items-center gap-2 text-xs text-neutral-600 hover:text-neutral-900 transition"
-              >
-                Role para ver os cortes
-                <span className="animate-bounce">↓</span>
-              </a>
-            </div>
+            
           </header>
-        </Reveal>
 
         {/* Aviso */}
-        <Reveal delayMs={60}>
           <div className="mb-6 rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur px-6 py-5 text-sm text-neutral-700 text-center shadow-sm">
             <strong className="font-medium">Valor médio:</strong> o preço por
             unidade é aproximado e pode variar conforme o peso real do produto.
             O valor final é confirmado no WhatsApp.
           </div>
-        </Reveal>
 
         {loading ? (
           <div className="mb-8 text-center text-sm text-neutral-700">
@@ -196,8 +185,6 @@ export default function ProdutosPage() {
           </div>
         ) : null}
 
-        {/* ✅ TUDO JUNTO NO MESMO REVEAL: busca + filtros + contagem + 1ª “fileira” */}
-        <Reveal delayMs={70}>
           <div id="filtros">
             {/* Busca */}
             <div className="mb-6 rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-4 shadow-sm">
@@ -315,7 +302,6 @@ export default function ProdutosPage() {
               ))}
             </section>
           </div>
-        </Reveal>
 
         {/* ✅ Resto: com Reveal só quando NÃO estiver pesquisando */}
         {rest.length > 0 && (
@@ -326,14 +312,13 @@ export default function ProdutosPage() {
               }
 
               return (
-                <Reveal key={product.id} delayMs={i * 30}>
-                  <ProductCard product={product} />
-                </Reveal>
+                <ProductCard key={product.id} product={product} />
               );
             })}
           </section>
         )}
       </div>
+      </Reveal>
     </main>
   );
 }

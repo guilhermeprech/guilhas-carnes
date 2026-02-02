@@ -413,10 +413,8 @@ export default function EventosPage() {
               Escolha o tipo de evento e envie o orçamento direto no WhatsApp.
             </p>
           </header>
-        </Reveal>
 
         {/* ✅ Seletor + Detalhes juntos no MESMO Reveal */}
-        <Reveal delayMs={60}>
           <div className="space-y-6">
             {/* Seletor */}
             <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-4 shadow-sm">
@@ -743,12 +741,10 @@ export default function EventosPage() {
               </section>
             )}
           </div>
-        </Reveal>
 
         {/* FORM */}
         <div ref={formRef} className="mt-10" />
 
-        <Reveal delayMs={130}>
           <section className="rounded-3xl border border-neutral-200 bg-white/60 backdrop-blur p-6 shadow-sm">
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <div>
@@ -860,10 +856,8 @@ export default function EventosPage() {
               )}
             </div>
           </section>
-        </Reveal>
 
         {/* Aviso final */}
-        <Reveal delayMs={180}>
           <div className="mt-10 text-center text-sm text-neutral-700">
             <span className="inline-block rounded-full border border-neutral-300 bg-white/60 px-4 py-2">
               Atendimento e disponibilidade variam conforme agenda da semana.
