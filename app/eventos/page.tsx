@@ -397,9 +397,9 @@ export default function EventosPage() {
 
   return (
     <main className="min-h-screen bg-[#F6F2EA] px-5 md:px-10 py-10 text-neutral-900">
+      <Reveal>
       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <Reveal>
           <header className="text-center mb-6 md:mb-10">
             <p className="uppercase tracking-[0.18em] text-xs text-neutral-600">
               Guilhas Carnes &amp; Assados
@@ -863,8 +863,8 @@ export default function EventosPage() {
               Atendimento e disponibilidade variam conforme agenda da semana.
             </span>
           </div>
-        </Reveal>
       </div>
+      </Reveal>
     </main>
   );
 }
