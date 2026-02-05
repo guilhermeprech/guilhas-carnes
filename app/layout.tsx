@@ -1,28 +1,34 @@
 import "./globals.css";
+import type { Metadata } from "next";
 import { CartProvider } from "./cart-context";
 import { Header } from "./components/Header";
 import { CartBottomBar } from "./components/cartBottomBar";
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL("https://www.guilhascarnes.com.br"),
+
   title: "Guilhas Carnes & Assados",
   description: "E-commerce de carnes - Guilhas Carnes & Assados",
 
-  // ✅ FAVICON
+  // ✅ FAVICON / ÍCONES
   icons: {
-    icon: "/favicon/favicon.ico",
-    shortcut: "/favicon/favicon.ico",
-    apple: "/favicon/apple-touch-icon.png",
+    icon: "web/public/favicon/favicon.ico",
+    shortcut: "web/public/favicon/favicon.ico",
+    apple: "web/public/favicon/apple-touch-icon.png",
   },
+
+  // ✅ MANIFEST (PWA)
+  manifest: "web/public/favicon/site.webmanifest",
 
   // ✅ OG (WhatsApp / Facebook)
   openGraph: {
     title: "Guilhas Carnes & Assados",
     description: "E-commerce de carnes - Guilhas Carnes & Assados",
-    url: "https://guilhascarnes.com.br",
+    url: "/",
     siteName: "Guilhas Carnes & Assados",
     images: [
       {
-        url: "/og-image.png",
+        url: "/images/og-image.png",
         width: 1200,
         height: 630,
         alt: "Guilhas Carnes & Assados",
@@ -32,12 +38,12 @@ export const metadata = {
     type: "website",
   },
 
-  // ✅ Twitter / X
+  // ✅ Twitter/X (ajuda em previews também)
   twitter: {
     card: "summary_large_image",
     title: "Guilhas Carnes & Assados",
     description: "E-commerce de carnes - Guilhas Carnes & Assados",
-    images: ["/og-image.png"],
+    images: ["/images/og-image.png"],
   },
 };
 
