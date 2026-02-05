@@ -88,7 +88,6 @@ export default function Home() {
 
               <h2 className="mt-3 text-3xl md:text-5xl font-semibold leading-tight">
                 Carnes de qualidade
-                <br className="hidden md:block" />
                 <br />
                 pro teu churrasco.
               </h2>
