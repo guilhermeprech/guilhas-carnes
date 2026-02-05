@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 
   // ✅ FAVICON / ÍCONES
   icons: {
-    icon: "/favicon/favicon.ico",
-    shortcut: "/favicon/favicon.ico",
-    apple: "/favicon/apple-touch-icon.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 
   // ✅ MANIFEST (PWA)
