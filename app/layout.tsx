@@ -12,13 +12,13 @@ export const metadata: Metadata = {
 
   // ✅ FAVICON / ÍCONES
   icons: {
-    icon: "web/public/favicon/favicon.ico",
-    shortcut: "web/public/favicon/favicon.ico",
-    apple: "web/public/favicon/apple-touch-icon.png",
+    icon: "/favicon/favicon.ico",
+    shortcut: "/favicon/favicon.ico",
+    apple: "/favicon/apple-touch-icon.png",
   },
 
   // ✅ MANIFEST (PWA)
-  manifest: "web/public/favicon/site.webmanifest",
+  manifest: "/favicon/site.webmanifest",
 
   // ✅ OG (WhatsApp / Facebook)
   openGraph: {
