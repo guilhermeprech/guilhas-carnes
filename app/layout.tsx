@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CartProvider } from "./cart-context";
 import { Header } from "./components/Header";
 import { CartBottomBar } from "./components/cartBottomBar";
+import { Footer } from "./components/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.guilhascarnes.com.br"),
@@ -54,11 +55,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-zinc-950 text-black">
+      <body className="bg-[#F6F2EA] text-neutral-900">
         <CartProvider>
-          <Header />
-          {children}
-          <CartBottomBar />
+          <div className="min-h-screen flex flex-col bg-[#F6F2EA]">
+            <Header />
+  
+            <main className="flex-1 bg-[#F6F2EA]">
+              {children}
+            </main>
+  
+            <Footer />
+            <CartBottomBar />
+          </div>
         </CartProvider>
       </body>
     </html>
