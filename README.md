@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Guilhas Carnes & Assados
 
-## Getting Started
-
-First, run the development server:
+Loja online de carnes — Next.js 16 (App Router) + Tailwind 4, hospedada na Vercel.
+Sem banco de dados: o catálogo é um arquivo JSON versionado no repositório.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # build de produção (valida o catálogo)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Onde fica cada coisa
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| O quê | Onde |
+| --- | --- |
+| Produtos | `data/products.json` |
+| Fotos dos produtos | `public/images/products/<id>.webp` |
+| WhatsApp, taxa de entrega, cidade, textos comerciais | `lib/site.ts` |
+| Leitura e validação do catálogo | `lib/products.ts` |
+| Cálculo do pedido e mensagem do WhatsApp | `lib/order.ts` |
+| Carrinho (localStorage, só id + quantidade) | `app/cart-context.tsx` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Editar o catálogo
 
-## Learn More
+Cada produto em `data/products.json`:
 
-To learn more about Next.js, take a look at the following resources:
+```json
+{
+  "id": "picanha",
+  "slug": "picanha",
+  "name": "Picanha",
+  "brand": "Apebrun",
+  "category": "Bovinos",
+  "subcategory": "Churrasco",
+  "description": null,
+  "saleType": "weight",
+  "pricePerKgCents": 11830,
+  "avgWeightGrams": 900,
+  "priceCents": 10647,
+  "image": "/images/products/picanha.webp",
+  "available": true,
+  "featured": false,
+  "sortOrder": 0
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Valores em centavos inteiros** (R$ 118,30 → `11830`). Nada de casas decimais.
+- `saleType`: `"weight"` para produtos vendidos por peso (o site mostra preço/kg e um valor *estimado*); `"unit"` para preço fixo (ex.: carvão).
+- `priceCents`: valor por unidade — estimado para `weight` (preço/kg × peso médio), fixo para `unit`.
+- `slug` vira a URL: `/produtos/picanha`. Use só letras minúsculas, números e hífen.
+- `category` e `subcategory` geram os filtros automaticamente — basta escrever igual nos produtos.
+- `available: false` mantém o produto visível como "Indisponível", sem botão de compra.
+- `featured: true` coloca o produto em "Em destaque" na home (sem nenhum marcado, aparecem os primeiros com foto).
+- Foto: salve um `.webp` (ou converta) em `public/images/products/` com o mesmo `id`. Sem foto, o site mostra o símbolo da marca.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+O build falha com uma mensagem clara se algum campo estiver errado.
 
-## Deploy on Vercel
+## Migração do Supabase
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O catálogo foi exportado do Supabase (tabela `products`) e convertido para `data/products.json`.
+O site não depende mais do Supabase. Para trazer as 8 fotos que só existiam no Storage
+(linha "dia a dia" e carvão), rode uma vez:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+node scripts/import-legacy-images.mjs
+```
+
+Depois disso o script pode ser apagado, e o projeto Supabase pode ser desativado.

@@ -1,131 +1,142 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Product } from "./data/products";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import type { Product } from "@/lib/types";
+import { subtotalCents, type OrderLine } from "@/lib/order";
 
-export type CartItem = {
-  product: Product;
-  qty: number;
-};
+// O carrinho guarda apenas id + quantidade. Preço, nome e foto vêm sempre do catálogo atual,
+// então uma mudança de preço no JSON aparece imediatamente para quem já tem itens salvos.
+type StoredItem = { id: string; qty: number };
+
+const STORAGE_KEY = "guilhas_cart_v2";
+const LEGACY_KEY = "guilhas_cart"; // formato antigo: [{ product: {...}, qty }]
+const MAX_QTY = 99;
 
 type CartContextValue = {
-  items: CartItem[];
-
-  // ações
-  addItem: (product: Product) => void;          // +1 (se não existir, cria)
-  decrement: (productId: string) => void;       // -1 (se chegar em 0, remove)
-  setQty: (productId: string, qty: number) => void; // seta quantidade (0 remove)
-  removeItem: (productId: string) => void;      // remove item do carrinho
-  clear: () => void;
-
-  // totais
+  ready: boolean;
+  lines: OrderLine[];
   totalItems: number;
-  totalPrice: number;
+  subtotalCents: number;
+  qtyOf: (id: string) => number;
+  add: (id: string, qty?: number) => void;
+  setQty: (id: string, qty: number) => void;
+  remove: (id: string) => void;
+  clear: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-function calcTotals(items: CartItem[]) {
-  const totalItems = items.reduce((acc, i) => acc + i.qty, 0);
-  const totalPrice = items.reduce((acc, i) => acc + i.qty * i.product.price, 0);
-  return { totalItems, totalPrice };
+function clampQty(n: number) {
+  return Math.max(0, Math.min(MAX_QTY, Math.floor(Number.isFinite(n) ? n : 0)));
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  // Carrega do LocalStorage quando abre o site
-  useEffect(() => {
-    const raw = localStorage.getItem("guilhas_cart");
-    if (raw) {
-      try {
-        setItems(JSON.parse(raw));
-      } catch {
-        // se der ruim, ignora
+function readStorage(): StoredItem[] {
+  try {
+    const current = localStorage.getItem(STORAGE_KEY);
+    if (current) {
+      const parsed = JSON.parse(current);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .filter((x) => x && typeof x.id === "string")
+          .map((x) => ({ id: x.id, qty: clampQty(x.qty) }))
+          .filter((x) => x.qty > 0);
       }
     }
+    // migração do carrinho salvo pela versão anterior do site
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      const parsed = JSON.parse(legacy);
+      localStorage.removeItem(LEGACY_KEY);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .filter((x) => x?.product?.id)
+          .map((x) => ({ id: String(x.product.id), qty: clampQty(x.qty) }))
+          .filter((x) => x.qty > 0);
+      }
+    }
+  } catch {
+    // storage indisponível (modo privado etc.) — segue com carrinho vazio
+  }
+  return [];
+}
+
+export function CartProvider({ catalog, children }: { catalog: Product[]; children: React.ReactNode }) {
+  const [items, setItems] = useState<StoredItem[]>([]);
+  const [ready, setReady] = useState(false);
+
+  const byId = useMemo(() => new Map(catalog.map((p) => [p.id, p])), [catalog]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- leitura única do localStorage após a hidratação
+    setItems(readStorage());
+    setReady(true);
   }, []);
 
-  // Salva sempre que mudar
   useEffect(() => {
-    localStorage.setItem("guilhas_cart", JSON.stringify(items));
-  }, [items]);
+    if (!ready) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      /* ignora */
+    }
+  }, [items, ready]);
 
-  const { totalItems, totalPrice } = useMemo(() => calcTotals(items), [items]);
+  // Itens que saíram do catálogo ou ficaram indisponíveis não entram no pedido
+  const lines = useMemo<OrderLine[]>(
+    () =>
+      items
+        .map((i) => ({ product: byId.get(i.id), qty: i.qty }))
+        .filter((l): l is OrderLine => !!l.product && l.product.available),
+    [items, byId],
+  );
 
-  function addItem(product: Product) {
+  const qtyOf = useCallback((id: string) => items.find((i) => i.id === id)?.qty ?? 0, [items]);
+
+  const add = useCallback(
+    (id: string, qty = 1) => {
+      const product = byId.get(id);
+      if (!product?.available) return;
+      setItems((prev) => {
+        const found = prev.find((i) => i.id === id);
+        if (found) return prev.map((i) => (i.id === id ? { ...i, qty: clampQty(i.qty + qty) } : i));
+        return [...prev, { id, qty: clampQty(qty) }];
+      });
+    },
+    [byId],
+  );
+
+  const setQty = useCallback((id: string, qty: number) => {
+    const q = clampQty(qty);
     setItems((prev) => {
-      const idx = prev.findIndex((x) => x.product.id === product.id);
-      if (idx >= 0) {
-        const copy = [...prev];
-        copy[idx] = { ...copy[idx], qty: copy[idx].qty + 1 };
-        return copy;
-      }
-      return [...prev, { product, qty: 1 }];
+      if (q === 0) return prev.filter((i) => i.id !== id);
+      if (!prev.some((i) => i.id === id)) return [...prev, { id, qty: q }];
+      return prev.map((i) => (i.id === id ? { ...i, qty: q } : i));
     });
-  }
+  }, []);
 
-  function decrement(productId: string) {
-    setItems((prev) => {
-      const idx = prev.findIndex((x) => x.product.id === productId);
-      if (idx < 0) return prev;
+  const remove = useCallback((id: string) => setItems((prev) => prev.filter((i) => i.id !== id)), []);
+  const clear = useCallback(() => setItems([]), []);
 
-      const copy = [...prev];
-      const nextQty = copy[idx].qty - 1;
-
-      if (nextQty <= 0) {
-        copy.splice(idx, 1);
-        return copy;
-      }
-
-      copy[idx] = { ...copy[idx], qty: nextQty };
-      return copy;
-    });
-  }
-
-  function setQty(productId: string, qty: number) {
-    const q = Math.max(0, Math.floor(qty || 0));
-
-    setItems((prev) => {
-      const idx = prev.findIndex((x) => x.product.id === productId);
-      if (idx < 0) {
-        // Não cria item aqui porque não temos o "product" completo nesse método.
-        // (o addItem continua sendo o caminho pra inserir novo)
-        return prev;
-      }
-
-      if (q === 0) return prev.filter((x) => x.product.id !== productId);
-
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], qty: q };
-      return copy;
-    });
-  }
-
-  function removeItem(productId: string) {
-    setItems((prev) => prev.filter((x) => x.product.id !== productId));
-  }
-
-  function clear() {
-    setItems([]);
-  }
-
-  const value: CartContextValue = {
-    items,
-    addItem,
-    decrement,
-    setQty,
-    removeItem,
-    clear,
-    totalItems,
-    totalPrice,
-  };
+  const value = useMemo<CartContextValue>(
+    () => ({
+      ready,
+      lines,
+      totalItems: lines.reduce((acc, l) => acc + l.qty, 0),
+      subtotalCents: subtotalCents(lines),
+      qtyOf,
+      add,
+      setQty,
+      remove,
+      clear,
+    }),
+    [ready, lines, qtyOf, add, setQty, remove, clear],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used inside CartProvider");
+  if (!ctx) throw new Error("useCart precisa estar dentro de <CartProvider>");
   return ctx;
 }
