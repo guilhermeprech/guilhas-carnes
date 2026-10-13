@@ -60,12 +60,6 @@ O build falha com uma mensagem clara se algum campo estiver errado.
 
 ## Migração do Supabase
 
-O catálogo foi exportado do Supabase (tabela `products`) e convertido para `data/products.json`.
-O site não depende mais do Supabase. Para trazer as 8 fotos que só existiam no Storage
-(linha "dia a dia" e carvão), rode uma vez:
-
-```bash
-node scripts/import-legacy-images.mjs
-```
-
-Depois disso o script pode ser apagado, e o projeto Supabase pode ser desativado.
+O catálogo e as fotos foram exportados do Supabase (tabela `products` e bucket `products`)
+e agora vivem no repositório. O site não depende mais do Supabase: as variáveis
+`NEXT_PUBLIC_SUPABASE_*` podem ser removidas da Vercel e o projeto Supabase pode ser desativado.
