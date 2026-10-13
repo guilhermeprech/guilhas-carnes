@@ -52,38 +52,42 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeLd) }} />
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="-mt-[var(--header-h)] bg-ink text-paper">
-        <div className="grid md:min-h-[min(100svh,56rem)] md:grid-cols-2">
-          <div className="flex flex-col justify-center px-5 pb-12 pt-[calc(var(--header-h)+3.5rem)] md:pb-16 md:pl-[max(2.5rem,calc((100vw-82rem)/2+2.5rem))] md:pr-12 md:pt-[calc(var(--header-h)+2rem)]">
-            <h1 className="max-w-[11ch] font-display text-[clamp(3rem,7.2vw,6rem)] leading-[0.92] tracking-[-0.02em]">
-              Carnes de qualidade pro teu churrasco.
-            </h1>
-            <p className="mt-6 max-w-[25rem] text-[1.075rem] leading-relaxed text-paper/70">
-              Teu açougue de confiança na palma da mão. Monta teu pedido e a gente entrega na porta da tua casa.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
-              <Link href="/produtos" className="btn btn-light">
-                Ver os cortes
-              </Link>
-              <Link href="#como-pedir" className="link-underline text-paper/80 hover:text-paper">
-                Como funciona
-              </Link>
-            </div>
-            <p className="mt-10 text-sm text-paper/45">
-              Entrega em {site.city} por {formatBRL(site.deliveryFeeCents)} ou retirada a combinar.
-            </p>
-          </div>
-
-          <div className="relative aspect-[4/5] md:aspect-auto">
+      <section className="relative -mt-[var(--header-h)] overflow-hidden bg-ink text-paper">
+        <div className="relative md:grid md:min-h-[min(100svh,58rem)] md:grid-cols-12">
+          <div className="absolute inset-0 md:relative md:order-2 md:col-span-7 md:col-start-6 lg:col-span-6 lg:col-start-7">
             <Image
               src={hero}
               alt="Tomahawk assado segurado por uma mão de luva preta, sobre tábua com sal grosso"
               fill
               priority
               placeholder="blur"
-              sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover object-[50%_40%]"
+              sizes="(min-width: 768px) 55vw, 100vw"
+              className="object-cover object-[50%_35%]"
             />
+            {/* degradê: funde a foto no fundo preto e garante leitura do texto */}
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/10 md:bg-gradient-to-r md:from-ink md:via-ink/20 md:to-transparent" />
+          </div>
+
+          <div className="relative flex min-h-[min(100svh,46rem)] flex-col justify-end px-5 pb-12 pt-[calc(var(--header-h)+4rem)] md:order-1 md:col-span-6 md:col-start-1 md:row-start-1 md:min-h-0 md:justify-center md:pb-20 md:pl-[max(2.5rem,calc((100vw-82rem)/2+2.5rem))] md:pr-0">
+            <div className="max-w-[34rem]">
+              <h1 className="font-display text-[clamp(3rem,11vw,6.25rem)] leading-[0.92] tracking-[-0.02em]">
+                Carnes de qualidade pro teu churrasco.
+              </h1>
+              <p className="mt-6 max-w-[26rem] text-[1.075rem] leading-relaxed text-paper/80">
+                Teu açougue de confiança na palma da mão. Monta teu pedido e a gente entrega na porta da tua casa.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/produtos" className="btn btn-light">
+                  Ver os cortes
+                </Link>
+                <Link href="#como-pedir" className="btn btn-outline text-paper">
+                  Como pedir
+                </Link>
+              </div>
+              <p className="mt-7 text-sm text-paper/60">
+                Entrega em {site.city} por {formatBRL(site.deliveryFeeCents)} ou retirada a combinar.
+              </p>
+            </div>
           </div>
         </div>
       </section>
