@@ -150,3 +150,27 @@
 /* scroll horizontal sem barra (vitrine mobile) */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Etiqueta de preço (balcão de açougue): papel, furo e recorte na ponta */
+.price-tag {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1em;
+  padding: 0.32em 0.7em 0.32em 1.35em;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  line-height: 1.2;
+  clip-path: polygon(0.55em 0, 100% 0, 100% 100%, 0.55em 100%, 0 50%);
+}
+.price-tag::before {
+  content: "";
+  position: absolute;
+  left: 0.62em;
+  top: 50%;
+  width: 0.36em;
+  height: 0.36em;
+  margin-top: -0.18em;
+  border-radius: 999px;
+  background: var(--color-ink);
+}

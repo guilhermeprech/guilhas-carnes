@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import raw from "../data/products.json";
 import { slugify } from "./format";
+import { CUT_IDS } from "./cuts";
 import type { Category, Product, ProductRecord } from "./types";
 
 const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
@@ -43,6 +44,9 @@ function validate(records: unknown): ProductRecord[] {
       if (typeof p[key] !== "boolean") fail(i, `"${key}" deve ser true/false`);
     }
     if (typeof p.sortOrder !== "number") fail(i, `"sortOrder" deve ser número`);
+    if (p.cut !== null && !CUT_IDS.includes(p.cut as string)) {
+      fail(i, `cut "${p.cut}" inválido — use null ou um de: ${CUT_IDS.join(", ")}`);
+    }
     for (const key of ["brand", "subcategory", "description"] as const) {
       if (p[key] !== null && typeof p[key] !== "string") fail(i, `"${key}" deve ser texto ou null`);
     }

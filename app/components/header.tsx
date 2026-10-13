@@ -17,6 +17,8 @@ export function Header({ categories }: { categories: NavCategory[] }) {
   const [open, setOpen] = useState(false);
 
   const overHero = pathname === "/" && !scrolled && !open;
+  const dark = pathname.startsWith("/produtos");
+  const light = overHero || open || dark; // texto claro
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -56,11 +58,13 @@ export function Header({ categories }: { categories: NavCategory[] }) {
             ? "bg-transparent border-b border-transparent text-paper"
             : open
               ? "bg-char border-b border-line-dark text-paper"
-              : "bg-paper/95 backdrop-blur-md border-b border-line text-ink",
+              : dark
+                ? "bg-ink/95 backdrop-blur-md border-b border-line-dark text-paper"
+                : "bg-paper/95 backdrop-blur-md border-b border-line text-ink",
         ].join(" ")}
       >
         <div className="wrap flex h-full items-center justify-between gap-6">
-          <Brand tone={overHero || open ? "light" : "dark"} />
+          <Brand tone={light ? "light" : "dark"} />
 
           <nav aria-label="Principal" className="hidden md:flex items-center gap-9 text-[0.95rem]">
             <Link
@@ -93,7 +97,7 @@ export function Header({ categories }: { categories: NavCategory[] }) {
               <span className="hidden md:inline text-[0.95rem]">Carrinho</span>
               {count > 0 && (
                 <span className="tabular absolute right-0.5 top-1 md:static inline-flex h-5 min-w-5 items-center justify-center bg-current px-1 text-[0.7rem] font-semibold">
-                  <span className={overHero || open ? "text-ink" : "text-paper"}>{count}</span>
+                  <span className={light ? "text-ink" : "text-paper"}>{count}</span>
                 </span>
               )}
             </Link>

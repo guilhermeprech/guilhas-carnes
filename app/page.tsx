@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import hero from "@/public/images/hero.webp";
-import { ProductCard } from "./components/product-card";
-import { ProductImage } from "./components/product-image";
+import { CutMap } from "./components/cut-map";
+import { ShowcaseGrid } from "./produtos/catalog-browser";
+import { CUTS } from "@/lib/cuts";
 import { WhatsAppIcon } from "./components/icons";
 import { getAllProducts, getBrands, getCategories, getFeaturedProducts } from "@/lib/products";
 import { formatBRL } from "@/lib/format";
@@ -11,34 +12,6 @@ import { site, whatsappLink } from "@/lib/site";
 export const metadata = {
   alternates: { canonical: "/" },
 };
-
-/** Prateleiras da home: subcategorias quando existem, senão a categoria inteira */
-function getShelves() {
-  return getCategories().flatMap((c) =>
-    c.subcategories.length
-      ? c.subcategories.map((s) => {
-          const items = getAllProducts().filter((p) => p.categorySlug === c.slug && p.subcategorySlug === s.slug);
-          return {
-            key: `${c.slug}-${s.slug}`,
-            title: s.name,
-            meta: `${c.name}, ${s.count} ${s.count === 1 ? "produto" : "produtos"}`,
-            href: `/produtos?categoria=${c.slug}&tipo=${s.slug}`,
-            image: items.find((p) => p.image)?.image ?? null,
-            sample: items.slice(0, 4).map((p) => p.name),
-          };
-        })
-      : [
-          {
-            key: c.slug,
-            title: c.name,
-            meta: `${c.count} ${c.count === 1 ? "produto" : "produtos"}`,
-            href: `/produtos?categoria=${c.slug}`,
-            image: c.image,
-            sample: getAllProducts().filter((p) => p.categorySlug === c.slug).slice(0, 4).map((p) => p.name),
-          },
-        ],
-  );
-}
 
 const steps = [
   {
@@ -56,8 +29,11 @@ const steps = [
 ];
 
 export default function HomePage() {
-  const featured = getFeaturedProducts(6);
-  const shelves = getShelves();
+  const featured = getFeaturedProducts(5);
+  const cutCounts: Record<string, number> = {};
+  for (const p of getAllProducts()) if (p.cut) cutCounts[p.cut] = (cutCounts[p.cut] ?? 0) + 1;
+  // categorias com produtos fora do mapa do boi
+  const others = getCategories().filter((c) => getAllProducts().some((p) => p.categorySlug === c.slug && !p.cut && c.slug !== "bovinos"));
   const brands = getBrands();
   const total = getAllProducts().length;
 
@@ -134,89 +110,91 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Categorias (balcão) ────────────────────────────── */}
-      <section aria-labelledby="balcao" className="wrap pb-20 md:pb-28">
-        <div className="flex items-end justify-between gap-6 border-b border-ink pb-4">
-          <h2 id="balcao" className="font-display text-[2rem] md:text-[2.5rem] leading-none">
-            Escolha pelo corte
-          </h2>
-          <Link href="/produtos" className="link-underline text-sm md:text-base shrink-0">
-            Todos os {total} produtos
-          </Link>
-        </div>
-        <ul>
-          {shelves.map((s) => (
-            <li key={s.key} className="border-b border-line">
-              <Link href={s.href} className="group grid grid-cols-[1fr_auto] items-center gap-5 py-6 md:grid-cols-[5rem_1fr_1.2fr_auto] md:gap-8 md:py-7">
-                <ProductImage
-                  src={s.image}
-                  alt=""
-                  sizes="80px"
-                  className="hidden md:block aspect-square w-20"
-                />
-                <div>
-                  <h3 className="font-display text-[2.25rem] md:text-[3rem] leading-none transition-transform duration-500 ease-out-soft group-hover:translate-x-1">
-                    {s.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-stone-dark">{s.meta}</p>
-                </div>
-                <p className="hidden md:block text-stone-dark leading-relaxed">{s.sample.join(", ")}</p>
-                <span className="text-sm underline decoration-1 underline-offset-4 decoration-ink/30 group-hover:decoration-ink">
-                  Ver
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ── Destaques ──────────────────────────────────────── */}
-      {featured.length > 0 && (
-        <section aria-labelledby="destaques" className="bg-white py-20 md:py-28">
-          <div className="wrap">
-            <div className="flex items-end justify-between gap-6">
-              <h2 id="destaques" className="font-display text-[2rem] md:text-[2.5rem] leading-none">
-                Em destaque
+      {/* ── Guia de cortes + destaques (vitrine escura) ─────── */}
+      <section aria-labelledby="balcao" className="bg-ink text-paper py-20 md:py-28">
+        <div className="wrap">
+          <div className="grid gap-8 md:grid-cols-12 md:items-center md:gap-10">
+            <div className="md:col-span-4">
+              <h2 id="balcao" className="font-display text-[clamp(2.5rem,5.5vw,4.25rem)] leading-[0.95]">
+                Escolha pelo corte
               </h2>
-              <Link href="/produtos" className="link-underline text-sm md:text-base shrink-0">
-                Ver catálogo
+              <p className="mt-4 max-w-sm text-paper/60 leading-relaxed">
+                Cada parte do boi leva aos cortes que saem dela, com preço por quilo.
+              </p>
+              {others.length > 0 && (
+                <p className="mt-6 text-paper/60">
+                  Também no catálogo:{" "}
+                  {others.map((c, i) => (
+                    <span key={c.slug}>
+                      {i > 0 && (i === others.length - 1 ? " e " : ", ")}
+                      <Link href={`/produtos?categoria=${c.slug}`} className="link-underline text-paper">
+                        {c.name.toLowerCase()}
+                      </Link>
+                    </span>
+                  ))}
+                  .
+                </p>
+              )}
+              <Link href="/produtos" className="btn btn-light mt-8">
+                Ver os {total} produtos
               </Link>
             </div>
-            <div className="mt-10 grid gap-y-8 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-3">
-              {featured.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+            <div className="-mx-2 md:col-span-8 md:mx-0">
+              <CutMap mode="link" counts={cutCounts} hrefBase="/produtos?corte=" />
             </div>
           </div>
-        </section>
-      )}
+          <ul className="no-scrollbar -mx-5 mt-6 flex gap-2 overflow-x-auto px-5 md:hidden" aria-label="Partes do boi">
+            {CUTS.filter((c) => cutCounts[c.id]).map((c) => (
+              <li key={c.id} className="shrink-0">
+                <Link href={`/produtos?corte=${c.id}`} className="inline-flex h-10 items-center bg-white/[0.06] px-4 text-paper/85">
+                  {c.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {featured.length > 0 && (
+            <div className="mt-20 md:mt-28">
+              <div className="flex items-end justify-between gap-6">
+                <h2 className="text-2xl font-semibold tracking-[-0.02em] md:text-3xl">Em destaque</h2>
+                <Link href="/produtos" className="link-underline shrink-0 text-sm text-paper/70 hover:text-paper md:text-base">
+                  Catálogo completo
+                </Link>
+              </div>
+              <div className="mt-8">
+                <ShowcaseGrid items={featured} />
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* ── Como pedir ─────────────────────────────────────── */}
-      <section id="como-pedir" aria-labelledby="como-pedir-titulo" className="scroll-mt-[var(--header-h)] bg-ink text-paper py-20 md:py-28">
+      <section id="como-pedir" aria-labelledby="como-pedir-titulo" className="scroll-mt-[var(--header-h)] py-20 md:py-28">
         <div className="wrap">
           <h2 id="como-pedir-titulo" className="font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-none">
             Como pedir
           </h2>
           <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((s, i) => (
-              <li key={s.title} className="border-t border-line-dark pt-6">
-                <span className="font-display text-[3.5rem] leading-none text-paper/35 tabular">{i + 1}</span>
-                <h3 className="mt-4 text-xl font-semibold">{s.title}</h3>
-                <p className="mt-2 max-w-[22rem] leading-relaxed text-paper/65">{s.text}</p>
+              <li key={s.title} className="border-t border-ink pt-6">
+                <span className="tabular text-sm font-semibold text-stone-dark">Passo {i + 1}</span>
+                <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em]">{s.title}</h3>
+                <p className="mt-2 max-w-[22rem] leading-relaxed text-stone-dark">{s.text}</p>
               </li>
             ))}
           </ol>
 
-          <dl className="mt-16 grid gap-px bg-line-dark sm:grid-cols-2">
-            <div className="bg-ink py-6 sm:pr-8">
-              <dt className="text-paper/60">Entrega em {site.city}</dt>
-              <dd className="mt-1 font-display text-[2.25rem] leading-tight tabular">
-                {formatBRL(site.deliveryFeeCents)} <span className="font-sans text-base text-paper/60">taxa fixa</span>
+          <dl className="mt-16 grid gap-px bg-line sm:grid-cols-2">
+            <div className="bg-white p-6 md:p-8">
+              <dt className="text-stone-dark">Entrega em {site.city}</dt>
+              <dd className="tabular mt-1 text-[2rem] font-semibold tracking-[-0.02em]">
+                {formatBRL(site.deliveryFeeCents)} <span className="text-base font-normal text-stone-dark">taxa fixa</span>
               </dd>
             </div>
-            <div className="bg-ink py-6 sm:pl-8">
-              <dt className="text-paper/60">Retirada</dt>
-              <dd className="mt-1 font-display text-[2.25rem] leading-tight">A combinar</dd>
+            <div className="bg-white p-6 md:p-8">
+              <dt className="text-stone-dark">Retirada</dt>
+              <dd className="mt-1 text-[2rem] font-semibold tracking-[-0.02em]">A combinar</dd>
             </div>
           </dl>
         </div>

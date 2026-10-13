@@ -17,6 +17,7 @@ npm run build    # build de produção (valida o catálogo)
 | Fotos dos produtos | `public/images/products/<id>.webp` |
 | WhatsApp, taxa de entrega, cidade, textos comerciais | `lib/site.ts` |
 | Leitura e validação do catálogo | `lib/products.ts` |
+| Mapa de cortes do boi (regiões e desenho) | `lib/cuts.ts`, `app/components/cut-map.tsx` |
 | Cálculo do pedido e mensagem do WhatsApp | `lib/order.ts` |
 | Carrinho (localStorage, só id + quantidade) | `app/cart-context.tsx` |
 
@@ -32,6 +33,7 @@ Cada produto em `data/products.json`:
   "brand": "Apebrun",
   "category": "Bovinos",
   "subcategory": "Churrasco",
+  "cut": "picanha",
   "description": null,
   "saleType": "weight",
   "pricePerKgCents": 11830,
@@ -49,6 +51,7 @@ Cada produto em `data/products.json`:
 - `priceCents`: valor por unidade — estimado para `weight` (preço/kg × peso médio), fixo para `unit`.
 - `slug` vira a URL: `/produtos/picanha`. Use só letras minúsculas, números e hífen.
 - `category` e `subcategory` geram os filtros automaticamente — basta escrever igual nos produtos.
+- `cut`: parte do boi no mapa de cortes (`dianteiro`, `contrafile`, `costela`, `file-mignon`, `vazio`, `alcatra`, `picanha`, `traseiro`) ou `null` para produtos fora do mapa (suínos, carvão, carne moída). As regiões e o desenho ficam em `lib/cuts.ts`.
 - `available: false` mantém o produto visível como "Indisponível", sem botão de compra.
 - `featured: true` coloca o produto em "Em destaque" na home (sem nenhum marcado, aparecem os primeiros com foto).
 - Foto: salve um `.webp` (ou converta) em `public/images/products/` com o mesmo `id`. Sem foto, o site mostra o símbolo da marca.

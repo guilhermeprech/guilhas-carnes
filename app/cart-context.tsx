@@ -30,34 +30,37 @@ function clampQty(n: number) {
   return Math.max(0, Math.min(MAX_QTY, Math.floor(Number.isFinite(n) ? n : 0)));
 }
 
+function parseItems(raw: string | null, legacy = false): StoredItem[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((x) => (legacy ? { id: x?.product?.id, qty: x?.qty } : { id: x?.id, qty: x?.qty }))
+      .filter((x) => typeof x.id === "string" && x.id)
+      .map((x) => ({ id: String(x.id), qty: clampQty(Number(x.qty)) }))
+      .filter((x) => x.qty > 0);
+  } catch {
+    return [];
+  }
+}
+
 function readStorage(): StoredItem[] {
   try {
-    const current = localStorage.getItem(STORAGE_KEY);
-    if (current) {
-      const parsed = JSON.parse(current);
-      if (Array.isArray(parsed)) {
-        return parsed
-          .filter((x) => x && typeof x.id === "string")
-          .map((x) => ({ id: x.id, qty: clampQty(x.qty) }))
-          .filter((x) => x.qty > 0);
-      }
-    }
+    const items = parseItems(localStorage.getItem(STORAGE_KEY));
     // migração do carrinho salvo pela versão anterior do site
-    const legacy = localStorage.getItem(LEGACY_KEY);
-    if (legacy) {
-      const parsed = JSON.parse(legacy);
+    const legacyRaw = localStorage.getItem(LEGACY_KEY);
+    if (legacyRaw !== null) {
       localStorage.removeItem(LEGACY_KEY);
-      if (Array.isArray(parsed)) {
-        return parsed
-          .filter((x) => x?.product?.id)
-          .map((x) => ({ id: String(x.product.id), qty: clampQty(x.qty) }))
-          .filter((x) => x.qty > 0);
+      for (const l of parseItems(legacyRaw, true)) {
+        if (!items.some((i) => i.id === l.id)) items.push(l);
       }
     }
+    return items;
   } catch {
     // storage indisponível (modo privado etc.) — segue com carrinho vazio
+    return [];
   }
-  return [];
 }
 
 export function CartProvider({ catalog, children }: { catalog: Product[]; children: React.ReactNode }) {

@@ -12,6 +12,8 @@ export type ProductRecord = {
   brand: string | null;
   category: string;
   subcategory: string | null;
+  /** Região do boi de onde vem o corte (ver lib/cuts.ts). null quando não se aplica. */
+  cut: string | null;
   description: string | null;
   saleType: SaleType;
   /** Preço por kg, em centavos */
